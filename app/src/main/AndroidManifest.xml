@@ -21,7 +21,7 @@
             </intent-filter>
 
         </activity>
-        
+
         <!-- main -->
         <activity
             android:name=".MainActivity"

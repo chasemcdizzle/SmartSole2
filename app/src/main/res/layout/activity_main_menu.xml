@@ -1,0 +1,54 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    tools:context="com.chase.smartsole2.MainMenu"
+    android:id="@+id/main_menu_layout"
+    android:background="#ff555555">
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:text="PROFILE"
+        android:id="@+id/profile_button"
+        android:background="#ffffffff"
+        android:textSize="20dp"
+        android:textColor="@android:color/darker_gray"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:text="HEAT MAP"
+        android:id="@+id/heatmap_button"
+        android:background="#ffffffff"
+        android:textSize="20dp"
+        android:textColor="@android:color/darker_gray"
+        android:layout_below="@+id/profile_button"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:text="FUCK YOUR SHIT"
+        android:id="@+id/sessions_button"
+        android:background="#ffffffff"
+        android:textSize="20dp"
+        android:textColor="@android:color/darker_gray"
+        android:layout_below="@+id/heatmap_button"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SETTINGS"
+        android:id="@+id/settings_button"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>

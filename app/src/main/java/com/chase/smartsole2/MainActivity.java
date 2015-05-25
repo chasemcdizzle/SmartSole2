@@ -85,6 +85,14 @@ public class MainActivity extends ActivityGroup {
         tabSpec.setIndicator("Profile");
         myTabs.addTab(tabSpec);
 
+
+        //attempt to add a third tab (success)
+        tabSpec = myTabs.newTabSpec("Poot");
+        tabSpec.setContent(new Intent(this, MainMenu.class));
+        tabSpec.setIndicator("TEMP_BTN");
+        myTabs.addTab(tabSpec);
+
+
         /*
         //bluetooth stuff
         try
@@ -201,6 +209,7 @@ public class MainActivity extends ActivityGroup {
         }
 
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -324,7 +333,6 @@ public class MainActivity extends ActivityGroup {
         });
         t.start();
     }
-
 
     public void listenForData() {
         final Handler handler = new Handler();
@@ -550,4 +558,5 @@ public class MainActivity extends ActivityGroup {
             }
         }
     }
+
 }

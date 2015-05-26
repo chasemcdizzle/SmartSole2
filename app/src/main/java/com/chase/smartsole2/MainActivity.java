@@ -17,6 +17,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
 
@@ -68,29 +70,51 @@ public class MainActivity extends ActivityGroup {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //setup
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
         //setup tab host
+        /*
         TabHost myTabs = (TabHost)findViewById(R.id.tabHost);
         myTabs.setup();
         myTabs.setup(this.getLocalActivityManager());
+        */
 
         //add first tab
-        TabHost.TabSpec tabSpec = myTabs.newTabSpec("heatmap");
-        LinearLayout tab1LinearLayout = (LinearLayout) findViewById(R.id.tab1);
-        //Bitmap image = Bitmap.createBitmap(25, 25, Bitmap.Config.ARGB_8888);
+        //TabHost.TabSpec tabSpec = myTabs.newTabSpec("heatmap");
+
+        LinearLayout tab1LinearLayout = (LinearLayout) findViewById(R.id.heatmap_layout);
         mGLView = new MyGLSurfaceView(this);
+
         //tab1LinearLayout.addView(new MyView(tab1LinearLayout.getContext()));
         tab1LinearLayout.addView(mGLView);
+
+        /*
         tabSpec.setContent(R.id.tab1);
         tabSpec.setIndicator("Heatmap");
         myTabs.addTab(tabSpec);
+        */
 
+        /*
         //add second tab
         tabSpec = myTabs.newTabSpec("profile");
         tabSpec.setContent(new Intent(this, Tab2Activity.class));
         tabSpec.setIndicator("Profile");
         myTabs.addTab(tabSpec);
+        */
+
+
+        /*
+        //attempt to add a third tab (success)
+        tabSpec = myTabs.newTabSpec("Poot");
+        tabSpec.setContent(new Intent(this, MainMenu.class));
+        tabSpec.setIndicator("TEMP_BTN");
+        myTabs.addTab(tabSpec);
+        */
 
         /*
         //bluetooth stuff
@@ -139,7 +163,7 @@ public class MainActivity extends ActivityGroup {
             //imageColors[i] = 715827882;
             //Bitmap image = Bitmap.createBitmap(imageColors, 100, 100, Bitmap.Config.ARGB_8888);
             myImage = Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888);
-            Log.d(TAG, Integer.toString(myImage.getHeight()));
+            //Log.d(TAG, Integer.toString(myImage.getHeight()));
             //HeatmapThread heatmapThread = new HeatmapThread();
             //heatmapThread.start();
             //startHeatmapThread();
@@ -208,6 +232,7 @@ public class MainActivity extends ActivityGroup {
         }
 
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -332,7 +357,7 @@ public class MainActivity extends ActivityGroup {
         t.start();
     }
 
-
+    //unused
     public void listenForData() {
         final Handler handler = new Handler();
         final byte delimiter = 10; //This is the ASCII code for a newline character
@@ -557,4 +582,5 @@ public class MainActivity extends ActivityGroup {
             }
         }
     }
+
 }

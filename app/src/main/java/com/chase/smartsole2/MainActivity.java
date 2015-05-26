@@ -17,6 +17,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
 
@@ -61,30 +63,43 @@ public class MainActivity extends ActivityGroup {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //setup
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
         //setup tab host
+        /*
         TabHost myTabs = (TabHost)findViewById(R.id.tabHost);
         myTabs.setup();
         myTabs.setup(this.getLocalActivityManager());
+        */
 
         //add first tab
-        TabHost.TabSpec tabSpec = myTabs.newTabSpec("heatmap");
-        LinearLayout tab1LinearLayout = (LinearLayout) findViewById(R.id.tab1);
-        //Bitmap image = Bitmap.createBitmap(25, 25, Bitmap.Config.ARGB_8888);
+        //TabHost.TabSpec tabSpec = myTabs.newTabSpec("heatmap");
+
+        LinearLayout tab1LinearLayout = (LinearLayout) findViewById(R.id.heatmap_layout);
         mGLView = new MyGLSurfaceView(this);
 
         //tab1LinearLayout.addView(new MyView(tab1LinearLayout.getContext()));
         tab1LinearLayout.addView(mGLView);
+
+        /*
         tabSpec.setContent(R.id.tab1);
         tabSpec.setIndicator("Heatmap");
         myTabs.addTab(tabSpec);
+        */
 
+        /*
         //add second tab
         tabSpec = myTabs.newTabSpec("profile");
         tabSpec.setContent(new Intent(this, Tab2Activity.class));
         tabSpec.setIndicator("Profile");
         myTabs.addTab(tabSpec);
+        */
+
 
         /*
         //attempt to add a third tab (success)
@@ -141,7 +156,7 @@ public class MainActivity extends ActivityGroup {
             //imageColors[i] = 715827882;
             //Bitmap image = Bitmap.createBitmap(imageColors, 100, 100, Bitmap.Config.ARGB_8888);
             myImage = Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888);
-            Log.d(TAG, Integer.toString(myImage.getHeight()));
+            //Log.d(TAG, Integer.toString(myImage.getHeight()));
             //HeatmapThread heatmapThread = new HeatmapThread();
             //heatmapThread.start();
             //startHeatmapThread();

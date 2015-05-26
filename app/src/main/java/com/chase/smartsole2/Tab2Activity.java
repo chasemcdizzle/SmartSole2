@@ -3,9 +3,12 @@ package com.chase.smartsole2;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,7 +51,9 @@ public class Tab2Activity extends FragmentActivity {
                 "Name: " + prefs.getString("name", ""),
                 "Total Steps: ",
                 "Steps Today: ",
-                "Daily Step Goal: " + prefs.getInt("goal", 0)
+                "Daily Step Goal: " + prefs.getInt("goal", 0),
+                "Record",
+                "Sessions"
         };
         //Put them into a list so they will be mutable later
         List<String> items = new ArrayList<String>(Arrays.asList(itemStrings));
@@ -74,6 +79,24 @@ public class Tab2Activity extends FragmentActivity {
                 else if(itemPosition == 3){
                     // Set an EditText view to get user input
                     setStepGoal(itemPosition);
+                }
+                else if(itemPosition == 4){
+                    //saveData = msg.getData().getBoolean("save");
+                    Log.d(MainActivity.class.getSimpleName(), "record clicked");
+                    //saveFileName = msg.getData().getString("filename");
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean("save", true);
+                    bundle.putString("filename", "sessiontest2");
+                    //mainHandler.sendEmptyMessage(0);
+                    Message message = MainActivity.mainHandler.obtainMessage();
+                    message.setData(bundle);
+                    MainActivity.mainHandler.sendMessage(message);
+                }
+                else if(itemPosition == 5){
+                    Intent msgIntent = new Intent(activityContext, SaveService.class);
+                    msgIntent.putExtra(SaveService.EXTRA_PARAM2, "sessiontest2");
+                    msgIntent.setAction("com.db.chase.dbtest.action.read");
+                    startService(msgIntent);
                 }
                 else {
                     // ListView Clicked item value
@@ -159,6 +182,7 @@ public class Tab2Activity extends FragmentActivity {
                     }
                 }).show();
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

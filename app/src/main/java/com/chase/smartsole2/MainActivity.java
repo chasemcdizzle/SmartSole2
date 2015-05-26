@@ -46,15 +46,22 @@ public class MainActivity extends ActivityGroup {
     HeatPoint[] myPoints;
     int pointIndex;
 
-    private MyGLSurfaceView mGLView;
+    public static boolean saveData = false;
+    public static String saveFileName;
+
+    public static MyGLSurfaceView mGLView;
     //Random myRandom = new Random();
-    Handler mainHandler = new Handler(){
+    public static Handler mainHandler = new Handler(){
         @Override
         public void handleMessage(Message msg){
+            super.handleMessage(msg);
             //Log.d(TAG, "received a message");
-            float intensity = msg.getData().getFloat("intensity");
-            Log.d(TAG, "" + intensity);
-            mGLView.addPoint(0, 0, 150, intensity);
+            //float intensity = msg.getData().getFloat("intensity");
+            Log.d(MainActivity.class.getSimpleName(), "handling save message");
+            saveData = msg.getData().getBoolean("save");
+            saveFileName = msg.getData().getString("filename");
+            mGLView.setSave(saveData, saveFileName);
+            //mGLView.addPoint(0, 0, 150, intensity);
         }
     };
 

@@ -4,12 +4,14 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.content.Intent;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 import android.view.MotionEvent;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -42,10 +44,19 @@ public class MyGLSurfaceView extends GLSurfaceView {
     HeatPoint[] myPoints;
     int pointIndex;
 
+    Context mainContext;
+
+    //saving sensor data field variables
+    int[] saveBuffer;
+    int saveIndex;
+    boolean saveData = false;
+    String saveFileName;
+    int bufsSaved = 0;
+
 
 	public MyGLSurfaceView(Context context) {
 		super(context);
-
+        mainContext = context;
 		// Create an OpenGL ES 2.0 context.
 		setEGLContextClientVersion(2);
 
@@ -67,6 +78,57 @@ public class MyGLSurfaceView extends GLSurfaceView {
         //startRandomThread(height, width);
 
 	}
+
+    public void setSave(boolean save, String filename){
+        saveData = save;
+        saveFileName = filename;
+        Log.d(MainActivity.class.getSimpleName(), "saveset() finished, saveset val: " + saveData);
+    }
+
+    public void startPlaybackThread(int height, int width) {
+        //maybe make this a global variable or will have scope issues
+        ArrayList<HeatPoint> playbackPoints = new ArrayList<HeatPoint>();
+        /*
+        grab the points array from whatever we get via getextra or whatever
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                Random myRandom = new Random();
+                //create temporary array to store the frame in
+                HeatPoint[] myHeatpoints = new HeatPoint[8];
+                int x = 0;
+                while (x < playbackPoints.length) {
+                        int i = x;
+                        try{
+                            for(; i < x+8; x++) {
+                                try{
+                                    float randIntensity = (float) ((myRandom.nextFloat()*.5)+.5);
+                                    myHeatpoints[i] = playbackPoints.get(i);
+                                }
+                                catch(Exception e){
+
+                                }
+                        }
+                        //if the last frame has less than 8 points, populate the rest of the 8 points with 0 intensity
+                        //even if catch happens, for loop will still increment, so i represents the first point
+                        //that wasn't plotted
+                        if(i < x+7){
+                            for(int y = x+i; y < x+8; y++){
+                                //create a new empty point to set for points that didn't get recorded
+                                myHeatpoints[i] = new HeatPoint(0,0,0,0);
+                            }
+                        }
+                        mRenderer.addPoints(myHeatpoints);
+                        requestRender();
+                        x += 8;
+                        }
+                }
+            }
+        });
+        t.start();
+         */
+
+    }
+
     public void startRandomThread(int height, int width) {
         final int viewHeight = height;
         final int viewWidth = width;
@@ -142,16 +204,15 @@ public class MyGLSurfaceView extends GLSurfaceView {
             if(!heatmapOn) {
                 //startRandomThread(height, width);
 
-
                 try
                 {
                     Log.d(TAG, "try");
                     findBT();
                     openBT();
+                    heatmapOn = true;
                 }
                 catch (IOException ex) { Log.d(TAG, "couldn't find/open"); }
 
-                heatmapOn = true;
             }
 			/*
             mRenderer.onTouchEvent(e.getX(), e.getY());
@@ -217,8 +278,10 @@ public class MyGLSurfaceView extends GLSurfaceView {
         readBufferPosition = 0;
         readBuffer = new byte[1024];
 
-        Thread t = new Thread(new Runnable() {
+        saveBuffer = new int[1024];
+        saveIndex = 0;
 
+        Thread t = new Thread(new Runnable() {
             public void run(){
                 //initialize heatpoint buffer / index
                 myPoints = new HeatPoint[8];
@@ -253,8 +316,10 @@ public class MyGLSurfaceView extends GLSurfaceView {
                                     else if(b == 68){
                                         //Log.d(MainActivity.class.getSimpleName(), "found D");
                                         try {
+                                            //add a condition here such that if(!playback)
                                             mRenderer.addPoints(myPoints);
                                             requestRender();
+                                            //Log.d(MainActivity.class.getSimpleName(), "updated");
                                             if(sampleSize < 4)
                                                 sampleSize++;
                                             //Log.d(MainActivity.class.getSimpleName(), "added points");
@@ -284,11 +349,34 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
                                     //low pass filter
                                     int preintensity = Integer.parseInt(myData);
+                                    //Log.d(MainActivity.class.getSimpleName(), "savedata val: " + saveData);
+                                    if(saveData){
+                                        if(saveIndex == 1024) {
+                                            saveIndex = 0;
+                                            Intent msgIntent = new Intent(mainContext, SaveService.class);
+                                            msgIntent.putExtra(SaveService.EXTRA_PARAM1, saveBuffer);
+                                            msgIntent.putExtra(SaveService.EXTRA_PARAM2, saveFileName);
+                                            //probably dont need to make a new array for next buf b/c putExtra already copies the array
+                                            //so we don't have to worry about it being modified before we're done saving it
+                                            //saveBuffer = new int[1024];
+                                            msgIntent.setAction("com.db.chase.dbtest.action.save");
+                                            mainContext.startService(msgIntent);
+                                            Log.d(MainActivity.class.getSimpleName(), "saveservice started");
+                                            bufsSaved++;
+                                            if(bufsSaved == 2){
+                                                saveData = false;
+                                                Log.d(MainActivity.class.getSimpleName(), "finished saving");
+                                            }
+                                        }
+                                        saveBuffer[saveIndex] = 1023 - preintensity;
+                                        saveIndex++;
+                                    }
+
                                     if(preintensity > 1000)
                                         preintensity = 1500;
                                     int intensity = 1500 - preintensity;
                                     pointAverages[pointIndex] = pointAverages[pointIndex] - (pointAverages[pointIndex]/sampleSize) + (intensity/(double)sampleSize);
-                                    Log.d(TAG, "PointIndex " + pointIndex + ": " + pointAverages[pointIndex]);
+                                    //Log.d(TAG, "PointIndex " + pointIndex + ": " + pointAverages[pointIndex]);
                                     myPoints[pointIndex].intensity = (float)(pointAverages[pointIndex]/1023.0);
                                     //myPoints[pointIndex].intensity = (float)(intensity/1023.0);
                                     //Log.d(TAG, String.valueOf(myPoints[pointIndex].intensity));

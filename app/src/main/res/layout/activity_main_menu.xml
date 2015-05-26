@@ -33,7 +33,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="180dp"
-        android:text="FUCK YOUR SHIT"
+        android:text="SESSIONS"
         android:id="@+id/sessions_button"
         android:background="#ffffffff"
         android:textSize="20dp"

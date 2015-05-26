@@ -38,16 +38,19 @@ public class Heights {
 
     private int xLocations[] = {0, 48, 11, 90, 20, 99, 26, 53};
     private int yLocations[] = {20, 73, 118, 125, 208, 235, 323, 361};
-    //vertical pad for points
+
+    //vertical & horizontal padding for points
     private int verticalPad;
-    //horizontal pad for points
     private int horizontalPad;
+
     //scale for point positions
     private double xScale;
     private double yScale;
+
     //furthest points for scaling
     private final int furthestX = 99;
-    private final int furthestY = 361;
+    private final int furthestY = 361; //with 20 offset (see yLocations array)
+
 
     //dimensions of image were 137x400
 
@@ -123,11 +126,13 @@ public class Heights {
 		this.bufferIndex = 0;
 		this.pointCount = 0;
 
-        horizontalPad = (this.width/2) - (137/2);
-        verticalPad = (this.height/2) - (400/2);
+		//function of the screen width
+		yScale = (this.height*(0.85)/this.furthestY);
+		xScale = yScale;
 
-        xScale = 2;
-        yScale = 1.8;
+		//use these!
+        horizontalPad = (this.width/2) - (((int) (this.furthestX*xScale) )/2);
+        verticalPad = (this.height/2) - (((int) ((this.furthestY+20/* + blur radius*/)*yScale) ) / 2);//20 offsets, see yPositions array
 
         GLES20.glClearColor(0f, 0f, 0f, 1f);
 	}
@@ -305,6 +310,7 @@ public class Heights {
 	 * @param size Size (diameter)
 	 * @param intensity Intensity (>= 0 and <= 1)
 	 */
+	//not used anymore
 	public synchronized void addPoint(float x, float y, float size, float intensity) {
         if (this.pointCount >= 1) {
             this.update();
@@ -339,7 +345,8 @@ public class Heights {
         */
 }
 
-    public synchronized void addPoints(HeatPoint points[]){
+	//I believe the scaling of the heatmap points is here
+    public synchronized void addPoints(HeatPoint points[]) {
         if (this.pointCount >= 1) {
             this.update();
         }
@@ -348,9 +355,9 @@ public class Heights {
             //float y = this.height - points[i].y;
             int y = yLocations[i];
             y = this.height - y;
-            float newY = this.height - (int)(yLocations[i]*yScale);
-            float s = points[i].size / 2;
-            float newX = (int)(xLocations[i]*xScale)+130;
+            float newY = this.height - ( (int)(yLocations[i]*yScale) + verticalPad );
+            float s = points[i].size*((float)xScale) / 2;
+            float newX = (int)(xLocations[i]*xScale) + horizontalPad;
             //Log.d(MainActivity.class.getSimpleName(), "y: " + y + " = height: " + this.height + " - yloc: " + yLocations[i]);
             this.addVertex(newX, newY, -s, -s, points[i].intensity);
             this.addVertex(newX, newY, +s, -s, points[i].intensity);
@@ -363,4 +370,5 @@ public class Heights {
             totalPoints++;
         }
     }
+
 }

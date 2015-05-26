@@ -26,9 +26,7 @@
                     android:id="@+id/tab1"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:orientation="vertical"
-                    android:weightSum="1">
-
+                    android:orientation="vertical">
                 </LinearLayout>
 
                 <LinearLayout
@@ -43,5 +41,4 @@
             </FrameLayout>
         </LinearLayout>
     </TabHost>
-
 </LinearLayout>

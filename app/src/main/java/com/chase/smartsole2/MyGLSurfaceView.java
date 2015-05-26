@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 /**
@@ -19,6 +21,7 @@ import java.util.UUID;
  * This view can also be used to capture touch events, such as a user
  * interacting with drawn objects.
  */
+
 public class MyGLSurfaceView extends GLSurfaceView {
     String TAG = MainActivity.class.getSimpleName();
 	private MyGLRenderer mRenderer;
@@ -42,6 +45,8 @@ public class MyGLSurfaceView extends GLSurfaceView {
     HeatPoint[] myPoints;
     int pointIndex;
 
+    final long mBlueToothWatchDogCount = 1000000;
+    boolean connectionTimeout = false;
 
 	public MyGLSurfaceView(Context context) {
 		super(context);
@@ -50,13 +55,13 @@ public class MyGLSurfaceView extends GLSurfaceView {
 		setEGLContextClientVersion(2);
 
 		// Set the Renderer for drawing on the GLSurfaceView
-		mRenderer = new MyGLRenderer();
+        mRenderer = new MyGLRenderer();
 		setRenderer(mRenderer);
 
 		// Render the view only when there is a change in the drawing data
 		setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
-        height = this.getHeight();
+        height = this.getHeight(); //TODO is the view scaling already done here?
         width = this.getWidth();
 
         heatmapOn = false;
@@ -67,6 +72,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
         //startRandomThread(height, width);
 
 	}
+
     public void startRandomThread(int height, int width) {
         final int viewHeight = height;
         final int viewWidth = width;
@@ -110,7 +116,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
         t.start();
     }
 
-    public synchronized void addPoint(int x, int y, int size, float intensity){
+    public synchronized void addPoint(int x, int y, int size, float intensity) {
         mRenderer.addPoint(x, y, size, intensity);
         numPoints++;
         requestRender();
@@ -142,17 +148,35 @@ public class MyGLSurfaceView extends GLSurfaceView {
             if(!heatmapOn) {
                 //startRandomThread(height, width);
 
-
                 try
                 {
                     Log.d(TAG, "try");
                     findBT();
                     openBT();
-                }
-                catch (IOException ex) { Log.d(TAG, "couldn't find/open"); }
 
-                heatmapOn = true;
+                    //only go true if we successfully find and open bluetooth
+                    heatmapOn = true;
+
+                }
+                catch (IOException ex) {
+                    Log.d(TAG, "couldn't find/open"); //did not find bluetooth
+
+                    //TODO added a temp heat map!
+                    Log.d("Tom's String: ", "Generating a temporary heatmap");
+                    myPoints = new HeatPoint[8];
+                    for(int i = 0; i < myPoints.length; i++) {
+                        //Log.d(TAG, "x:" + x + " and y:" + y);
+                        myPoints[i] = new HeatPoint(0, 0, 300, 0.5f);
+                    }
+                    mRenderer.addPoints(myPoints);
+                    requestRender();
+
+
+                }
+
+
             }
+
 			/*
             mRenderer.onTouchEvent(e.getX(), e.getY());
 			requestRender();
@@ -168,8 +192,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 	}
 
 
-    void findBT()
-    {
+    void findBT() {
         Log.d(TAG, "starting findBT()");
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if(mBluetoothAdapter == null)
@@ -197,14 +220,20 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 }
             }
         }
+
+        //throw error to open the smartphone bluetooth settings
+
+        //call openBT if device != null
+
+
         Log.d(TAG, "Bluetooth Device Found");
     }
 
-    void openBT() throws IOException
-    {
+    void openBT() throws IOException {
         UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //Standard SerialPortService ID
         mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
         mmSocket.connect();
+
         mmInputStream = mmSocket.getInputStream();
 
         listenForData();
@@ -219,16 +248,22 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
         Thread t = new Thread(new Runnable() {
 
-            public void run(){
+
+            public void run() {
+
                 //initialize heatpoint buffer / index
                 myPoints = new HeatPoint[8];
                 pointIndex = 0;
                 for(int i = 0; i < myPoints.length; i++){
                     //Log.d(TAG, "x:" + x + " and y:" + y);
-                    myPoints[i] = new HeatPoint(0, 0, 300, 0);
+                    myPoints[i] = new HeatPoint(0, 0, 200, 0);
                 }
 
-                while(true) {
+                //watchdog timer/counter
+                long mBlueToothWatchDogCounter = 0;
+
+                //generate heatmap!
+                while( !connectionTimeout ) {
                     try
                     {
                         int bytesAvailable = mmInputStream.available();
@@ -255,8 +290,8 @@ public class MyGLSurfaceView extends GLSurfaceView {
                                         try {
                                             mRenderer.addPoints(myPoints);
                                             requestRender();
-                                            if(sampleSize < 4)
-                                                sampleSize++;
+                                            if(sampleSize < 4) sampleSize++; //filter transient
+
                                             //Log.d(MainActivity.class.getSimpleName(), "added points");
                                             /*
                                             try {
@@ -265,6 +300,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                                                 Thread.currentThread().interrupt();
                                             }
                                             */
+
                                         } catch (Exception e) {
                                             Log.d(MainActivity.class.getSimpleName(), "couldn't plot");
                                         }
@@ -293,23 +329,39 @@ public class MyGLSurfaceView extends GLSurfaceView {
                                     //myPoints[pointIndex].intensity = (float)(intensity/1023.0);
                                     //Log.d(TAG, String.valueOf(myPoints[pointIndex].intensity));
                                     pointIndex++;
-                                }
+                                }//end 'S' and 'D' checking
                                 else
                                 {
                                     readBuffer[readBufferPosition++] = b;
                                 }
-                            }
-                        }
-                    }
+
+                                //set no-connect timer to 0
+                                mBlueToothWatchDogCounter = 0;
+
+
+                            } //end byte analyzing
+                        } //end bytes > zero
+
+                        //no connect timer --> break
+                        if(++mBlueToothWatchDogCounter > mBlueToothWatchDogCount) break;
+
+                    } //end try
                     catch (IOException ex)
                     {
-                        Log.d(MainActivity.class.getSimpleName(), "broken thread?");
+                        //break to disconnect bluetooth
+                        break;
                     }
-                }
+                }//end while loop
+
+                //disconnect from bluetooth
+                Log.d(MainActivity.class.getSimpleName(), "Bluetooth Disconnected");
+                heatmapOn = false;
+
             }
         });
-        t.start();
-    }
+        t.start(); //start running the heatmap!
 
+
+    }//end function
 
 }

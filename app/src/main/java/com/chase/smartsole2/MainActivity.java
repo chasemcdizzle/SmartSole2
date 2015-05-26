@@ -73,6 +73,7 @@ public class MainActivity extends ActivityGroup {
         LinearLayout tab1LinearLayout = (LinearLayout) findViewById(R.id.tab1);
         //Bitmap image = Bitmap.createBitmap(25, 25, Bitmap.Config.ARGB_8888);
         mGLView = new MyGLSurfaceView(this);
+
         //tab1LinearLayout.addView(new MyView(tab1LinearLayout.getContext()));
         tab1LinearLayout.addView(mGLView);
         tabSpec.setContent(R.id.tab1);
@@ -85,13 +86,13 @@ public class MainActivity extends ActivityGroup {
         tabSpec.setIndicator("Profile");
         myTabs.addTab(tabSpec);
 
-
+        /*
         //attempt to add a third tab (success)
         tabSpec = myTabs.newTabSpec("Poot");
         tabSpec.setContent(new Intent(this, MainMenu.class));
         tabSpec.setIndicator("TEMP_BTN");
         myTabs.addTab(tabSpec);
-
+        */
 
         /*
         //bluetooth stuff
@@ -334,6 +335,7 @@ public class MainActivity extends ActivityGroup {
         t.start();
     }
 
+    //unused
     public void listenForData() {
         final Handler handler = new Handler();
         final byte delimiter = 10; //This is the ASCII code for a newline character

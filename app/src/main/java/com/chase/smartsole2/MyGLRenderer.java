@@ -129,7 +129,7 @@ Log.i(LOG, "width=" + width + ", height=" + height);
         mHeatmap.addPoint(x, y, size, intensity);
     }
 
-    public void addPoints(HeatPoint heatpoints[]){
+    public void addPoints(HeatPoint heatpoints[]) {
         mHeatmap.addPoints(heatpoints);
     }
 

@@ -13,16 +13,16 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"></LinearLayout>
+        android:layout_weight="1.5"></LinearLayout>
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_weight="1.6">
 
         <ImageView
-            android:src="@drawable/logo"
+            android:src="@drawable/sole_logo"
             android:id="@+id/logo_view"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -45,10 +45,9 @@
             android:id="@+id/progressBar1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="58dp"
-            android:layout_gravity="center_horizontal" />
-    </LinearLayout>
+            android:layout_gravity="center_horizontal"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+    </RelativeLayout>
 
 </LinearLayout>

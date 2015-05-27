@@ -22,7 +22,6 @@ public class MainMenu extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         //test
         Log.d("main menu","CREATED");
 

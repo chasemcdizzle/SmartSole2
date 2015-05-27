@@ -1,4 +1,4 @@
-package com.chase.smartsole2.util;
+package com.chase.smartsole2;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -16,11 +16,6 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
-
-import com.chase.smartsole2.HeatPoint;
-import com.chase.smartsole2.MainMenu;
-import com.chase.smartsole2.MyGLSurfaceView;
-import com.chase.smartsole2.R;
 
 import java.io.InputStream;
 import java.util.ArrayList;

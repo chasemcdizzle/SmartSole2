@@ -50,8 +50,9 @@ public class MyGLPlaybackView extends GLSurfaceView{
     String saveFileName;
     int bufsSaved = 0;
 
-    //playback variable
+    //playback variables
     ArrayList<HeatPoint> playbackPoints;
+    boolean playbackData = false;
 
     public MyGLPlaybackView(Context context) {
         super(context);
@@ -79,36 +80,53 @@ public class MyGLPlaybackView extends GLSurfaceView{
     }
 
     public void startPlaybackThread(ArrayList<HeatPoint> pts) {
-        //maybe make this a global variable or will have scope issues
+        //turn off bluetooth thread because we are going to playback data now
+        //set playback boolean to true so can't start bluetooth until its done
+        playbackData = true;
+        Log.d("playbackview", "playbackthread started");
         playbackPoints = pts;
         //grab the points array from whatever we get via getextra or whatever
         Thread t = new Thread(new Runnable() {
             public void run() {
+                Log.d("playbackview", "run() started. size: " + playbackPoints.size());
                 HeatPoint[] myHeatpoints = new HeatPoint[8];
                 int x = 0;
-                while (x < playbackPoints.size()) {
-                    int i = x;
-                    for(; i < x+8; x++) {
+                while (x < playbackPoints.size() && playbackData == true) {
+                    //Log.d("playbackview", "while() running");
+                    int i = 0;
+                    for(; i < 8; i++) {
                         try{
-                            myHeatpoints[i] = playbackPoints.get(i);
+                            myHeatpoints[i] = playbackPoints.get(x+i);
+                            //Log.d("playbackview", "stored point");
                         }
                         catch(Exception e){
 
                         }
-                        //if the last frame has less than 8 points, populate the rest of the 8 points with 0 intensity
-                        //even if catch happens, for loop will still increment, so i represents the first point
-                        //that wasn't plotted
-                        if(i < x+7){
-                            for(int y = x+i; y < x+8; y++){
-                                //create a new empty point to set for points that didn't get recorded
-                                myHeatpoints[y] = new HeatPoint(0,0,0,0);
-                            }
-                        }
-                        mRenderer.addPoints(myHeatpoints);
-                        requestRender();
                     }
+                    //if the last frame has less than 8 points, populate the rest of the 8 points with 0 intensity
+                    //even if catch happens, for loop will still increment, so i represents the first point
+                    //that wasn't plotted
+                    /*
+                    if(i < x+8){
+                        for(int y = x+i; y < x+8; y++){
+                            //create a new empty point to set for points that didn't get recorded
+                            myHeatpoints[y] = new HeatPoint(0,0,0,0);
+                        }
+                    }
+                    */
+                    //Log.d("playbackview", "plotting frame");
+                    mRenderer.addPoints(myHeatpoints);
+                    requestRender();
+                    try{Thread.sleep(50);}
+                    catch(Exception e){
+
+                    }
+
                     x += 8;
                 }
+                //set playback boolean false
+                playbackData = false;
+                //Log.d("playbackview", "finished plotting");
             }
         });
         t.start();

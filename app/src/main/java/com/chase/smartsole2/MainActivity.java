@@ -56,34 +56,34 @@ public class MainActivity extends ActivityGroup {
     public static ArrayList<HeatPoint> pointList;
 
     //public static MyGLSurfaceView mGLView;
-    public static MyGLPlaybackView mGLView;
+    public static MyGLSurfaceView mGLView;
     //Random myRandom = new Random();
     public static Handler mainHandler = new Handler(){
         @Override
         public void handleMessage(Message msg){
             super.handleMessage(msg);
-            //Log.d(TAG, "received a message");
+            int[] pointArray = msg.getData().getIntArray("playback");
+            saveData = msg.getData().getBoolean("save");
+            Log.d(MainActivity.class.getSimpleName(), "savedata: " + saveData + " pointArray: " + pointArray);
             //float intensity = msg.getData().getFloat("intensity");
 
-            //fully working saving communication via message
-            /*
-            Log.d(MainActivity.class.getSimpleName(), "handling save message");
-            saveData = msg.getData().getBoolean("save");
-            saveFileName = msg.getData().getString("filename");
-            mGLView.setSave(saveData, saveFileName);
-            */
-            //should be working playback, but not. mglview is null
-
-            int[] pointArray = msg.getData().getIntArray("playback");
-            pointList = new ArrayList<HeatPoint>();
-            for(int i = 0; i < pointArray.length; i++){
-                pointList.add(new HeatPoint(0,0,300, pointArray[i]));
+            //send save message if the message contains save boolean
+            if(saveData == true) {
+                Log.d(MainActivity.class.getSimpleName(), "handling save message");
+                saveData = msg.getData().getBoolean("save");
+                saveFileName = msg.getData().getString("filename");
+                mGLView.setSave(saveData, saveFileName);
             }
-            Log.d(MainActivity.class.getSimpleName(), "handling playback mglviewref: " + mGLView);
-            mGLView.startPlaybackThread(pointList);
 
-            //mGLView.addPoint(0, 0, 150, intensity);
-
+            //otherwise it is a playback message
+            else {
+                pointList = new ArrayList<HeatPoint>();
+                for (int i = 0; i < pointArray.length; i++) {
+                    pointList.add(new HeatPoint(0, 0, 200, pointArray[i] / 1023.0f));
+                }
+                Log.d(MainActivity.class.getSimpleName(), "handling playback mglviewref: " + mGLView);
+                mGLView.startPlaybackThread(pointList);
+            }
 
         }
     };
@@ -114,7 +114,7 @@ public class MainActivity extends ActivityGroup {
         LinearLayout tab1LinearLayout = (LinearLayout) findViewById(R.id.heatmap_layout);
         //mGLView = new MyGLSurfaceView(this);
         //Log.d(Activity);
-        mGLView = new MyGLPlaybackView(this);
+        mGLView = new MyGLSurfaceView(this);
 
         //tab1LinearLayout.addView(new MyView(tab1LinearLayout.getContext()));
         tab1LinearLayout.addView(mGLView);
@@ -213,7 +213,7 @@ public class MainActivity extends ActivityGroup {
     @Override
     public void onBackPressed() {
         //super.onBackPressed(); //do not call constructor! (causes self to be destroyed)
-        moveTaskToBack(true);
+        //moveTaskToBack(true);
         startActivity(new Intent(MainActivity.this, MainMenu.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
     }
 

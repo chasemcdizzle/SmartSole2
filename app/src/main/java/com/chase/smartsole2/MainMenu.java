@@ -1,7 +1,6 @@
 package com.chase.smartsole2;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -56,7 +55,7 @@ public class MainMenu extends Activity {
             public void onClick(View v) {
 
                 //this should eventually go to the playback list
-                startActivity( new Intent(MainMenu.this, MainActivity.class).addFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT )  );
+                startActivity( new Intent(MainMenu.this, Tab2Activity.class).addFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT )  );
             }
         });
 

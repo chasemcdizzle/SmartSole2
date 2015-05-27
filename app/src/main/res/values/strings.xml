@@ -9,5 +9,6 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">SOLE</string>
     <string name="title_activity_main_menu">MainMenu</string>
+    <string name="title_activity_playback">PlaybackActivity</string>
 
 </resources>

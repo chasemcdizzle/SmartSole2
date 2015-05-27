@@ -14,8 +14,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 
 /**
@@ -55,8 +53,13 @@ public class MyGLSurfaceView extends GLSurfaceView {
     int[] saveBuffer;
     int saveIndex;
     boolean saveData = false;
+    boolean trueSave = false;
     String saveFileName;
     int bufsSaved = 0;
+
+    //playback variable
+    ArrayList<HeatPoint> playbackPoints;
+    boolean playbackData = false;
 
 
 	public MyGLSurfaceView(Context context) {
@@ -90,47 +93,59 @@ public class MyGLSurfaceView extends GLSurfaceView {
         Log.d(MainActivity.class.getSimpleName(), "saveset() finished, saveset val: " + saveData);
     }
 
-    public void startPlaybackThread(int height, int width) {
-        //maybe make this a global variable or will have scope issues
-        ArrayList<HeatPoint> playbackPoints = new ArrayList<HeatPoint>();
-        /*
-        grab the points array from whatever we get via getextra or whatever
+
+    public void startPlaybackThread(ArrayList<HeatPoint> pts) {
+        //turn off bluetooth thread because we are going to playback data now
+        //set playback boolean to true so can't start bluetooth until its done
+        playbackData = true;
+        Log.d("playbackview", "playbackthread started");
+        playbackPoints = pts;
+        //grab the points array from whatever we get via getextra or whatever
         Thread t = new Thread(new Runnable() {
             public void run() {
-                Random myRandom = new Random();
-                //create temporary array to store the frame in
+                Log.d("playbackview", "run() started. size: " + playbackPoints.size());
                 HeatPoint[] myHeatpoints = new HeatPoint[8];
                 int x = 0;
-                while (x < playbackPoints.length) {
-                        int i = x;
+                while (x < playbackPoints.size() && playbackData == true) {
+                    //Log.d("playbackview", "while() running");
+                    int i = 0;
+                    for(; i < 8; i++) {
                         try{
-                            for(; i < x+8; x++) {
-                                try{
-                                    float randIntensity = (float) ((myRandom.nextFloat()*.5)+.5);
-                                    myHeatpoints[i] = playbackPoints.get(i);
-                                }
-                                catch(Exception e){
+                            myHeatpoints[i] = playbackPoints.get(x+i);
+                            //Log.d("playbackview", "stored point");
+                        }
+                        catch(Exception e){
 
-                                }
                         }
-                        //if the last frame has less than 8 points, populate the rest of the 8 points with 0 intensity
-                        //even if catch happens, for loop will still increment, so i represents the first point
-                        //that wasn't plotted
-                        if(i < x+7){
-                            for(int y = x+i; y < x+8; y++){
-                                //create a new empty point to set for points that didn't get recorded
-                                myHeatpoints[i] = new HeatPoint(0,0,0,0);
-                            }
+                    }
+                    //if the last frame has less than 8 points, populate the rest of the 8 points with 0 intensity
+                    //even if catch happens, for loop will still increment, so i represents the first point
+                    //that wasn't plotted
+                    /*
+                    if(i < x+8){
+                        for(int y = x+i; y < x+8; y++){
+                            //create a new empty point to set for points that didn't get recorded
+                            myHeatpoints[y] = new HeatPoint(0,0,0,0);
                         }
-                        mRenderer.addPoints(myHeatpoints);
-                        requestRender();
-                        x += 8;
-                        }
+                    }
+                    */
+                    //Log.d("playbackview", "plotting frame");
+                    mRenderer.addPoints(myHeatpoints);
+                    requestRender();
+                    try{Thread.sleep(50);}
+                    catch(Exception e){
+
+                    }
+
+                    x += 8;
                 }
+                //set playback boolean false
+                playbackData = false;
+                //Log.d("playbackview", "finished plotting");
             }
         });
         t.start();
-         */
+
 
     }
 
@@ -238,7 +253,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
 
             }
-
 			/*
             mRenderer.onTouchEvent(e.getX(), e.getY());
 			requestRender();
@@ -344,6 +358,10 @@ public class MyGLSurfaceView extends GLSurfaceView {
                                     if(b == 83){
                                         //Log.d(MainActivity.class.getSimpleName(), "found S");
                                         pointIndex = 0;
+                                        //we want to start saving data, so we wait for the beginning of a frame
+                                        //then begin recording
+                                        if(saveData)
+                                            trueSave = true;
                                         continue;
                                     }
                                     //need to display data b/c a full frame has been transmitted
@@ -353,15 +371,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
                                             mRenderer.addPoints(myPoints);
                                             requestRender();
                                             if(sampleSize < 4) sampleSize++; //filter transient
-
-                                            //Log.d(MainActivity.class.getSimpleName(), "added points");
-                                            /*
-                                            try {
-                                                Thread.sleep(500);
-                                            } catch (InterruptedException e) {
-                                                Thread.currentThread().interrupt();
-                                            }
-                                            */
 
                                         } catch (Exception e) {
                                             Log.d(MainActivity.class.getSimpleName(), "couldn't plot");
@@ -383,6 +392,12 @@ public class MyGLSurfaceView extends GLSurfaceView {
                                     //low pass filter
                                     int preintensity = Integer.parseInt(myData);
                                     //Log.d(MainActivity.class.getSimpleName(), "savedata val: " + saveData);
+                                    if(preintensity > 1000)
+                                        preintensity = 1500;
+                                    int intensity = 1500 - preintensity;
+                                    pointAverages[pointIndex] = pointAverages[pointIndex] - (pointAverages[pointIndex]/sampleSize) + (intensity/(double)sampleSize);
+                                    //Log.d(TAG, "PointIndex " + pointIndex + ": " + pointAverages[pointIndex]);
+                                    myPoints[pointIndex].intensity = (float)(pointAverages[pointIndex]/1023.0);
                                     if(saveData){
                                         if(saveIndex == 1024) {
                                             saveIndex = 0;
@@ -398,19 +413,13 @@ public class MyGLSurfaceView extends GLSurfaceView {
                                             bufsSaved++;
                                             if(bufsSaved == 2){
                                                 saveData = false;
+                                                trueSave = false;
                                                 Log.d(MainActivity.class.getSimpleName(), "finished saving");
                                             }
                                         }
-                                        saveBuffer[saveIndex] = 1023 - preintensity;
+                                        saveBuffer[saveIndex] = (int)pointAverages[pointIndex];
                                         saveIndex++;
                                     }
-
-                                    if(preintensity > 1000)
-                                        preintensity = 1500;
-                                    int intensity = 1500 - preintensity;
-                                    pointAverages[pointIndex] = pointAverages[pointIndex] - (pointAverages[pointIndex]/sampleSize) + (intensity/(double)sampleSize);
-                                    //Log.d(TAG, "PointIndex " + pointIndex + ": " + pointAverages[pointIndex]);
-                                    myPoints[pointIndex].intensity = (float)(pointAverages[pointIndex]/1023.0);
                                     //myPoints[pointIndex].intensity = (float)(intensity/1023.0);
                                     //Log.d(TAG, String.valueOf(myPoints[pointIndex].intensity));
                                     pointIndex++;

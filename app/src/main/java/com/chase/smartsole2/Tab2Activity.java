@@ -18,6 +18,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.chase.smartsole2.util.PlaybackActivity;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -88,30 +90,31 @@ public class Tab2Activity extends FragmentActivity {
                     //saveFileName = msg.getData().getString("filename");
                     Bundle bundle = new Bundle();
                     bundle.putBoolean("save", true);
-                    bundle.putString("filename", "sessiontest2");
+                    bundle.putString("filename", "sessiontest7");
                     //mainHandler.sendEmptyMessage(0);
                     Message message = MainActivity.mainHandler.obtainMessage();
                     message.setData(bundle);
 
+                    startActivity( new Intent(Tab2Activity.this, MainActivity.class).addFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT )  );
                     MainActivity.mainHandler.sendMessage(message);
                 }
                 //read file
                 else if(itemPosition == 5){
                     Intent msgIntent = new Intent(activityContext, SaveService.class);
-                    msgIntent.putExtra(SaveService.EXTRA_PARAM2, "sessiontest2");
+                    msgIntent.putExtra(SaveService.EXTRA_PARAM2, "sessiontest7");
                     msgIntent.setAction("com.db.chase.dbtest.action.read");
                     startService(msgIntent);
                 }
                 //get points from file
                 else if(itemPosition == 6){
                     textFileHandler = new TextFileHandler("", activityContext);
-                    int[] points = textFileHandler.getIntArrayFromFile("sessiontest2");
+                    int[] points = textFileHandler.getIntArrayFromFile("sessiontest7");
                     Bundle bundle = new Bundle();
                     bundle.putIntArray("playback", points);
-                    Message message = MainActivity.mainHandler.obtainMessage();
+                    Message message = PlaybackActivity.mainHandler.obtainMessage();
                     message.setData(bundle);
-
-                    MainActivity.mainHandler.sendMessage(message);
+                    startActivity(new Intent(Tab2Activity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                    PlaybackActivity.mainHandler.sendMessage(message);
                 }
                 else {
                     // ListView Clicked item value

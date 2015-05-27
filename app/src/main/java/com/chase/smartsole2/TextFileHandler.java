@@ -112,10 +112,10 @@ public class TextFileHandler {
         catch(Exception e){
             Log.d(MainActivity.class.getSimpleName(), "Could not openfileOutput");
         }
-        Log.d(MainActivity.class.getSimpleName(), "right before length = ");
+        //Log.d(MainActivity.class.getSimpleName(), "right before length = ");
         int length = (int) file.length();
-        Log.d(MainActivity.class.getSimpleName(), "Printing length: ");
-        Log.d(MainActivity.class.getSimpleName(), String.valueOf(length));
+        //Log.d(MainActivity.class.getSimpleName(), "Printing length: ");
+        //Log.d(MainActivity.class.getSimpleName(), String.valueOf(length));
         byte[] bytes = new byte[length];
         try {
             try {

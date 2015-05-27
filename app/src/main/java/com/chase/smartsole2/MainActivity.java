@@ -98,6 +98,9 @@ public class MainActivity extends ActivityGroup {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
+        //check if onCreate is being called several times when returning to activity
+        Log.d(TAG, "heat map main activity CREATED");
+
         //setup tab host
         /*
         TabHost myTabs = (TabHost)findViewById(R.id.tabHost);
@@ -175,6 +178,45 @@ public class MainActivity extends ActivityGroup {
         }
     }
     */
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "main activity STARTED");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "main activity RESUMED");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "main activity PAUSED");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "main activity STOPPED");
+    }
+
+    @Override
+    protected void onDestroy() {
+        //I do not want to be destroyed
+        super.onDestroy();
+        Log.d(TAG, "main activity DESTROYED");
+    }
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed(); //do not call constructor! (causes self to be destroyed)
+        moveTaskToBack(true);
+        startActivity(new Intent(MainActivity.this, MainMenu.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+    }
+
     public class MyView extends View {
         Random myRandom;
         public MyView(Context context) {

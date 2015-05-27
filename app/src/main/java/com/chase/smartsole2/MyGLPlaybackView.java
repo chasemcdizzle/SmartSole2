@@ -49,6 +49,8 @@ public class MyGLPlaybackView extends GLSurfaceView{
     boolean saveData = false;
     String saveFileName;
     int bufsSaved = 0;
+
+    //playback variable
     ArrayList<HeatPoint> playbackPoints;
 
     public MyGLPlaybackView(Context context) {
@@ -73,6 +75,44 @@ public class MyGLPlaybackView extends GLSurfaceView{
         sampleSize = 1;
 
         //startRandomThread(height, width);
+
+    }
+
+    public void startPlaybackThread(ArrayList<HeatPoint> pts) {
+        //maybe make this a global variable or will have scope issues
+        playbackPoints = pts;
+        //grab the points array from whatever we get via getextra or whatever
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                HeatPoint[] myHeatpoints = new HeatPoint[8];
+                int x = 0;
+                while (x < playbackPoints.size()) {
+                    int i = x;
+                    for(; i < x+8; x++) {
+                        try{
+                            myHeatpoints[i] = playbackPoints.get(i);
+                        }
+                        catch(Exception e){
+
+                        }
+                        //if the last frame has less than 8 points, populate the rest of the 8 points with 0 intensity
+                        //even if catch happens, for loop will still increment, so i represents the first point
+                        //that wasn't plotted
+                        if(i < x+7){
+                            for(int y = x+i; y < x+8; y++){
+                                //create a new empty point to set for points that didn't get recorded
+                                myHeatpoints[y] = new HeatPoint(0,0,0,0);
+                            }
+                        }
+                        mRenderer.addPoints(myHeatpoints);
+                        requestRender();
+                    }
+                    x += 8;
+                }
+            }
+        });
+        t.start();
+
 
     }
 

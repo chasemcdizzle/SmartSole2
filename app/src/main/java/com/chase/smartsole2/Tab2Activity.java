@@ -30,6 +30,7 @@ public class Tab2Activity extends FragmentActivity {
     SharedPreferences.Editor editor;
     ArrayAdapter<String> adapter;
     Context activityContext;
+    TextFileHandler textFileHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +43,6 @@ public class Tab2Activity extends FragmentActivity {
         editor = prefs.edit();
         //must clear it for some strange reason
         editor.clear();
-
         //get listView object
         listView = (ListView)findViewById(R.id.listView2);
 
@@ -53,7 +53,8 @@ public class Tab2Activity extends FragmentActivity {
                 "Steps Today: ",
                 "Daily Step Goal: " + prefs.getInt("goal", 0),
                 "Record",
-                "Sessions"
+                "Sessions",
+                "Playback"
         };
         //Put them into a list so they will be mutable later
         List<String> items = new ArrayList<String>(Arrays.asList(itemStrings));
@@ -80,6 +81,7 @@ public class Tab2Activity extends FragmentActivity {
                     // Set an EditText view to get user input
                     setStepGoal(itemPosition);
                 }
+                //saves data
                 else if(itemPosition == 4){
                     //saveData = msg.getData().getBoolean("save");
                     Log.d(MainActivity.class.getSimpleName(), "record clicked");
@@ -90,13 +92,26 @@ public class Tab2Activity extends FragmentActivity {
                     //mainHandler.sendEmptyMessage(0);
                     Message message = MainActivity.mainHandler.obtainMessage();
                     message.setData(bundle);
+
                     MainActivity.mainHandler.sendMessage(message);
                 }
+                //read file
                 else if(itemPosition == 5){
                     Intent msgIntent = new Intent(activityContext, SaveService.class);
                     msgIntent.putExtra(SaveService.EXTRA_PARAM2, "sessiontest2");
                     msgIntent.setAction("com.db.chase.dbtest.action.read");
                     startService(msgIntent);
+                }
+                //get points from file
+                else if(itemPosition == 6){
+                    textFileHandler = new TextFileHandler("", activityContext);
+                    int[] points = textFileHandler.getIntArrayFromFile("sessiontest2");
+                    Bundle bundle = new Bundle();
+                    bundle.putIntArray("playback", points);
+                    Message message = MainActivity.mainHandler.obtainMessage();
+                    message.setData(bundle);
+
+                    MainActivity.mainHandler.sendMessage(message);
                 }
                 else {
                     // ListView Clicked item value

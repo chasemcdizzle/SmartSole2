@@ -20,10 +20,10 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
-import android.widget.TabHost;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -48,10 +48,15 @@ public class MainActivity extends ActivityGroup {
     HeatPoint[] myPoints;
     int pointIndex;
 
+    //save variables
     public static boolean saveData = false;
     public static String saveFileName;
 
-    public static MyGLSurfaceView mGLView;
+    //playback variable
+    public static ArrayList<HeatPoint> pointList;
+
+    //public static MyGLSurfaceView mGLView;
+    public static MyGLPlaybackView mGLView;
     //Random myRandom = new Random();
     public static Handler mainHandler = new Handler(){
         @Override
@@ -59,11 +64,27 @@ public class MainActivity extends ActivityGroup {
             super.handleMessage(msg);
             //Log.d(TAG, "received a message");
             //float intensity = msg.getData().getFloat("intensity");
+
+            //fully working saving communication via message
+            /*
             Log.d(MainActivity.class.getSimpleName(), "handling save message");
             saveData = msg.getData().getBoolean("save");
             saveFileName = msg.getData().getString("filename");
             mGLView.setSave(saveData, saveFileName);
+            */
+            //should be working playback, but not. mglview is null
+
+            int[] pointArray = msg.getData().getIntArray("playback");
+            pointList = new ArrayList<HeatPoint>();
+            for(int i = 0; i < pointArray.length; i++){
+                pointList.add(new HeatPoint(0,0,300, pointArray[i]));
+            }
+            Log.d(MainActivity.class.getSimpleName(), "handling playback mglviewref: " + mGLView);
+            mGLView.startPlaybackThread(pointList);
+
             //mGLView.addPoint(0, 0, 150, intensity);
+
+
         }
     };
 
@@ -88,7 +109,9 @@ public class MainActivity extends ActivityGroup {
         //TabHost.TabSpec tabSpec = myTabs.newTabSpec("heatmap");
 
         LinearLayout tab1LinearLayout = (LinearLayout) findViewById(R.id.heatmap_layout);
-        mGLView = new MyGLSurfaceView(this);
+        //mGLView = new MyGLSurfaceView(this);
+        //Log.d(Activity);
+        mGLView = new MyGLPlaybackView(this);
 
         //tab1LinearLayout.addView(new MyView(tab1LinearLayout.getContext()));
         tab1LinearLayout.addView(mGLView);

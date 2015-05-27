@@ -80,6 +80,22 @@ public class TextFileHandler {
         return pointList;
     }
 
+    public int[] getIntArrayFromFile(String fileName){
+        //loop through all of the rows of the table
+        int sensorNum = 0;
+        String fileData = readFile(fileName);
+        String[] sensors = fileData.split("\n");
+        //make numpoints the same size as the sensors string array
+        int[] points = new int[sensors.length];
+        for(int i = 0; i < sensors.length; i++){
+            if(!sensors.equals("")) {
+                int intensity = Integer.parseInt(sensors[i]);
+                points[i] = intensity;
+            }
+        }
+        return points;
+    }
+
     public String readFile(String fileName){
         Log.d(MainActivity.class.getSimpleName(), "in readFile() ");
         file = context.getFileStreamPath(fileName + ".txt");

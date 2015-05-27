@@ -185,7 +185,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
                             requestRender();
 
                         }
-
                         //Log.d(MainActivity.class.getSimpleName(), "loop end");
                 }
             }

@@ -22,6 +22,10 @@ public class MainMenu extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+        //test
+        Log.d("main menu","CREATED");
+
         //setup with no action bar
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -32,6 +36,9 @@ public class MainMenu extends Activity {
         profileButton = (Button) findViewById(R.id.profile_button);
         heatmapButton = (Button) findViewById(R.id.heatmap_button);
         sessionsButton = (Button) findViewById(R.id.sessions_button);
+
+        //start the heatmap activity (it will go in the bg because the on create puts this back... very jank)
+        startActivity( new Intent(MainMenu.this, MainActivity.class) );
 
         //set button click attributes
         profileButton.setOnClickListener(new View.OnClickListener() {

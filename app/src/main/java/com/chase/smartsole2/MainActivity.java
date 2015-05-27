@@ -132,6 +132,11 @@ public class MainActivity extends ActivityGroup {
         //startRandomHeatmapThread();
         //random heatmap points thread
         //startRandomHeatmapThread();
+
+
+        //when this class is created it will automatically open the main menu (puts this is the bg)
+        startActivity(new Intent(MainActivity.this, MainMenu.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+
     }
     /*
     public class HeatmapThread extends Thread{
@@ -190,7 +195,7 @@ public class MainActivity extends ActivityGroup {
     @Override
     public void onBackPressed() {
         //super.onBackPressed(); //do not call constructor! (causes self to be destroyed)
-        moveTaskToBack(true);
+        //moveTaskToBack(true);
         startActivity(new Intent(MainActivity.this, MainMenu.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
     }
 

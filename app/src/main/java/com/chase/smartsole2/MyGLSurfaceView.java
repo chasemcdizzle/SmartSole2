@@ -409,7 +409,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                                         preintensity = 1500;
                                     int intensity = 1500 - preintensity;
                                     pointAverages[pointIndex] = pointAverages[pointIndex] - (pointAverages[pointIndex]/sampleSize) + (intensity/(double)sampleSize);
-                                    Log.d(TAG, "PointIndex " + pointIndex + ": " + pointAverages[pointIndex]);
+                                    //Log.d(TAG, "PointIndex " + pointIndex + ": " + pointAverages[pointIndex]);
                                     myPoints[pointIndex].intensity = (float)(pointAverages[pointIndex]/1023.0);
                                     //myPoints[pointIndex].intensity = (float)(intensity/1023.0);
                                     //Log.d(TAG, String.valueOf(myPoints[pointIndex].intensity));

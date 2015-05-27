@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,25 +38,35 @@ public class MainMenu extends Activity {
         profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainMenu.this, MainActivity.class));
+
+                //flag is to not destroy itself
+                startActivity( new Intent(MainMenu.this, MainActivity.class).addFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT ) );
             }
         });
 
         heatmapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainMenu.this, MainActivity.class));
+                startActivity( new Intent(MainMenu.this, MainActivity.class).addFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT )  );
             }
         });
 
         sessionsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 //this should eventually go to the playback list
-                startActivity(new Intent(MainMenu.this, MainActivity.class));
+                startActivity( new Intent(MainMenu.this, MainActivity.class).addFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT )  );
             }
         });
+
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Log.d("main menu","DESTROYED");
 
     }
 

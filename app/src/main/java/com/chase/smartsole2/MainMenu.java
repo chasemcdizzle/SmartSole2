@@ -21,7 +21,8 @@ public class MainMenu extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        //start the heatmap activity (it will go in the bg because the on create puts this back... very jank)
+        startActivity( new Intent(MainMenu.this, MainActivity.class) );
         //test
         Log.d("main menu","CREATED");
 
@@ -36,8 +37,6 @@ public class MainMenu extends Activity {
         heatmapButton = (Button) findViewById(R.id.heatmap_button);
         sessionsButton = (Button) findViewById(R.id.sessions_button);
 
-        //start the heatmap activity (it will go in the bg because the on create puts this back... very jank)
-        startActivity( new Intent(MainMenu.this, MainActivity.class) );
 
         //set button click attributes
         profileButton.setOnClickListener(new View.OnClickListener() {
@@ -45,7 +44,7 @@ public class MainMenu extends Activity {
             public void onClick(View v) {
 
                 //flag is to not destroy itself
-                startActivity( new Intent(MainMenu.this, MainActivity.class).addFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT ) );
+                startActivity( new Intent(MainMenu.this, Tab2Activity.class).addFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT )  );
             }
         });
 
@@ -61,10 +60,9 @@ public class MainMenu extends Activity {
             public void onClick(View v) {
 
                 //this should eventually go to the playback list
-                startActivity( new Intent(MainMenu.this, Tab2Activity.class).addFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT )  );
+                startActivity( new Intent(MainMenu.this, SessionsActivity.class).addFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT )  );
             }
         });
-
     }
 
 

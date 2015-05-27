@@ -107,7 +107,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 HeatPoint[] myHeatpoints = new HeatPoint[8];
                 int x = 0;
                 while (x < playbackPoints.size() && playbackData == true) {
-                    //Log.d("playbackview", "while() running");
+                    Log.d("playbackview", "while() running");
                     int i = 0;
                     for(; i < 8; i++) {
                         try{
@@ -129,7 +129,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                         }
                     }
                     */
-                    //Log.d("playbackview", "plotting frame");
+                    Log.d("playbackview", "plotting frame");
                     mRenderer.addPoints(myHeatpoints);
                     requestRender();
                     try{Thread.sleep(50);}
@@ -140,8 +140,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                     x += 8;
                 }
                 //set playback boolean false
-                playbackData = false;
-                //Log.d("playbackview", "finished plotting");
+                Log.d("playbackview", "finished plotting");
             }
         });
         t.start();
@@ -359,16 +358,19 @@ public class MyGLSurfaceView extends GLSurfaceView {
                                         pointIndex = 0;
                                         //we want to start saving data, so we wait for the beginning of a frame
                                         //then begin recording
-                                        if(saveData)
+                                        if(saveData && !trueSave)
                                             trueSave = true;
                                         continue;
                                     }
                                     //need to display data b/c a full frame has been transmitted
                                     else if(b == 68){
                                         //Log.d(MainActivity.class.getSimpleName(), "found D");
+
                                         try {
-                                            mRenderer.addPoints(myPoints);
-                                            requestRender();
+                                            if(!playbackData) {
+                                                mRenderer.addPoints(myPoints);
+                                                requestRender();
+                                            }
                                             if(sampleSize < 4) sampleSize++; //filter transient
 
                                         } catch (Exception e) {
@@ -397,7 +399,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                                     pointAverages[pointIndex] = pointAverages[pointIndex] - (pointAverages[pointIndex]/sampleSize) + (intensity/(double)sampleSize);
                                     //Log.d(TAG, "PointIndex " + pointIndex + ": " + pointAverages[pointIndex]);
                                     myPoints[pointIndex].intensity = (float)(pointAverages[pointIndex]/1023.0);
-                                    if(saveData){
+                                    if(trueSave){
                                         if(saveIndex == 1024) {
                                             saveIndex = 0;
                                             Intent msgIntent = new Intent(mainContext, SaveService.class);
@@ -410,10 +412,16 @@ public class MyGLSurfaceView extends GLSurfaceView {
                                             mainContext.startService(msgIntent);
                                             Log.d(MainActivity.class.getSimpleName(), "saveservice started");
                                             bufsSaved++;
+                                            /*
                                             if(bufsSaved == 2){
                                                 saveData = false;
                                                 trueSave = false;
                                                 Log.d(MainActivity.class.getSimpleName(), "finished saving");
+                                            }
+                                            */
+                                            if(!saveData && trueSave){
+                                                trueSave = false;
+                                                Log.d(MainActivity.class.getSimpleName(), "stopped saving");
                                             }
                                         }
                                         saveBuffer[saveIndex] = (int)pointAverages[pointIndex];

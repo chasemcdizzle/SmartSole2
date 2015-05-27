@@ -10,5 +10,7 @@
     <string name="dummy_content">SOLE</string>
     <string name="title_activity_main_menu">MainMenu</string>
     <string name="title_activity_playback">PlaybackActivity</string>
+    <string name="title_activity_sessions">SessionsActivity</string>
+    <string name="title_activity_database">DatabaseActivity</string>
 
 </resources>

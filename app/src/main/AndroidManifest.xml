@@ -67,8 +67,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".util.PlaybackActivity"
+            android:name=".PlaybackActivity"
             android:label="@string/title_activity_playback" >
+        </activity>
+        <activity
+            android:name=".SessionsActivity"
+            android:label="@string/title_activity_sessions" >
+        </activity>
+        <activity
+            android:name=".DatabaseActivity"
+            android:label="@string/title_activity_database" >
         </activity>
     </application>
 

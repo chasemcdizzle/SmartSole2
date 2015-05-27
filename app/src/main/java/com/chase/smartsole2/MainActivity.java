@@ -26,7 +26,6 @@ import android.view.animation.AnimationSet;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TabHost;
 import android.widget.ToggleButton;
 
 import java.io.IOException;
@@ -135,7 +134,21 @@ public class MainActivity extends ActivityGroup {
         bluetoothImage = (ImageView) findViewById(R.id.bluetooth_icon);
 
         //record button ontouch listener for navigation back home
-
+        //set button click attributes
+        recordButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(((ToggleButton) v).isChecked()){
+                    mGLView.setSave(true, "sessiontest9");
+                    Log.d("mainactivity", "ischecked, starting save");
+                }
+                if(!((ToggleButton) v).isChecked()){
+                    mGLView.setSave(false, "sessiontest9");
+                    Log.d("mainactivity", "not checked, stopping save");
+                }
+                //flag is to not destroy itself
+            }
+        });
 
         /*
         tabSpec.setContent(R.id.tab1);
@@ -160,6 +173,7 @@ public class MainActivity extends ActivityGroup {
         */
 
         //when this class is created it will automatically open the main menu (puts this is the bg)
+        //startActivity(new Intent(MainActivity.this, MainMenu.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
         startActivity(new Intent(MainActivity.this, MainMenu.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
 
     }
@@ -241,6 +255,8 @@ public class MainActivity extends ActivityGroup {
     public void onBackPressed() {
         //super.onBackPressed(); //do not call constructor! (causes self to be destroyed)
         //moveTaskToBack(true);
+        if(mGLView.playbackData)
+            mGLView.playbackData = false;
         startActivity(new Intent(MainActivity.this, MainMenu.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
     }
 

@@ -18,8 +18,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.chase.smartsole2.util.PlaybackActivity;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -90,7 +88,7 @@ public class Tab2Activity extends FragmentActivity {
                     //saveFileName = msg.getData().getString("filename");
                     Bundle bundle = new Bundle();
                     bundle.putBoolean("save", true);
-                    bundle.putString("filename", "sessiontest7");
+                    bundle.putString("filename", "sessiontest5");
                     //mainHandler.sendEmptyMessage(0);
                     Message message = MainActivity.mainHandler.obtainMessage();
                     message.setData(bundle);
@@ -105,16 +103,16 @@ public class Tab2Activity extends FragmentActivity {
                     msgIntent.setAction("com.db.chase.dbtest.action.read");
                     startService(msgIntent);
                 }
-                //get points from file
+                //get points from file, playback
                 else if(itemPosition == 6){
                     textFileHandler = new TextFileHandler("", activityContext);
-                    int[] points = textFileHandler.getIntArrayFromFile("sessiontest7");
+                    int[] points = textFileHandler.getIntArrayFromFile("sessiontest9");
                     Bundle bundle = new Bundle();
                     bundle.putIntArray("playback", points);
-                    Message message = PlaybackActivity.mainHandler.obtainMessage();
+                    Message message = MainActivity.mainHandler.obtainMessage();
                     message.setData(bundle);
                     startActivity(new Intent(Tab2Activity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                    PlaybackActivity.mainHandler.sendMessage(message);
+                    MainActivity.mainHandler.sendMessage(message);
                 }
                 else {
                     // ListView Clicked item value

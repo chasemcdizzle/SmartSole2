@@ -88,7 +88,8 @@ public class TextFileHandler {
         //make numpoints the same size as the sensors string array
         int[] points = new int[sensors.length];
         for(int i = 0; i < sensors.length; i++){
-            if(!sensors.equals("")) {
+            Log.d("textfile handler", sensors[i]);
+            if(!sensors[i].equals("")) {
                 int intensity = Integer.parseInt(sensors[i]);
                 points[i] = intensity;
             }

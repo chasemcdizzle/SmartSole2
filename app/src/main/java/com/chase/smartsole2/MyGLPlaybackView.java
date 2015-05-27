@@ -92,7 +92,7 @@ public class MyGLPlaybackView extends GLSurfaceView{
                 HeatPoint[] myHeatpoints = new HeatPoint[8];
                 int x = 0;
                 while (x < playbackPoints.size() && playbackData == true) {
-                    //Log.d("playbackview", "while() running");
+                    Log.d("playbackview", "while() running");
                     int i = 0;
                     for(; i < 8; i++) {
                         try{

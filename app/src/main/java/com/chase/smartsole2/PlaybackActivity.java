@@ -13,7 +13,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
@@ -73,7 +72,7 @@ public class PlaybackActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
 
         //setup
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
@@ -98,43 +97,7 @@ public class PlaybackActivity extends ActionBarActivity {
 
         //tab1LinearLayout.addView(new MyView(tab1LinearLayout.getContext()));
         tab1LinearLayout.addView(mGLView);
-
-        /*
-        tabSpec.setContent(R.id.tab1);
-        tabSpec.setIndicator("Heatmap");
-        myTabs.addTab(tabSpec);
-        */
-
-        /*
-        //add second tab
-        tabSpec = myTabs.newTabSpec("profile");
-        tabSpec.setContent(new Intent(this, Tab2Activity.class));
-        tabSpec.setIndicator("Profile");
-        myTabs.addTab(tabSpec);
-        */
-
-
-        /*
-        //attempt to add a third tab (success)
-        tabSpec = myTabs.newTabSpec("Poot");
-        tabSpec.setContent(new Intent(this, MainMenu.class));
-        tabSpec.setIndicator("TEMP_BTN");
-        myTabs.addTab(tabSpec);
-        */
-
-        /*
-        //bluetooth stuff
-        try
-        {
-            Log.d(TAG, "try");
-            findBT();
-            openBT();
-        }
-        catch (IOException ex) { Log.d(TAG, "couldn't find/open"); }
-        */
-        //startRandomHeatmapThread();
-        //random heatmap points thread
-        //startRandomHeatmapThread();
+        startActivity(new Intent(PlaybackActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
     }
     /*
     public class HeatmapThread extends Thread{

@@ -19,8 +19,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
+import android.widget.ToggleButton;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,6 +60,11 @@ public class MainActivity extends ActivityGroup {
 
     public static MyGLSurfaceView mGLView;
     //Random myRandom = new Random();
+
+    ImageView navigationImage;
+    ImageView bluetoothImage;
+    ToggleButton recordButton;
+
     public static Handler mainHandler = new Handler(){
         @Override
         public void handleMessage(Message msg){
@@ -90,11 +102,18 @@ public class MainActivity extends ActivityGroup {
         //add first tab
         //TabHost.TabSpec tabSpec = myTabs.newTabSpec("heatmap");
 
+        //heatmap
         LinearLayout tab1LinearLayout = (LinearLayout) findViewById(R.id.heatmap_layout);
         mGLView = new MyGLSurfaceView(this);
-
-        //tab1LinearLayout.addView(new MyView(tab1LinearLayout.getContext()));
         tab1LinearLayout.addView(mGLView);
+
+        //icons
+        recordButton = (ToggleButton) findViewById(R.id.record_button);
+        navigationImage = (ImageView) findViewById(R.id.navigation_icon);
+        bluetoothImage = (ImageView) findViewById(R.id.bluetooth_icon);
+
+        //record button ontouch listener for navigation back home
+
 
         /*
         tabSpec.setContent(R.id.tab1);
@@ -110,7 +129,6 @@ public class MainActivity extends ActivityGroup {
         myTabs.addTab(tabSpec);
         */
 
-
         /*
         //attempt to add a third tab (success)
         tabSpec = myTabs.newTabSpec("Poot");
@@ -118,21 +136,6 @@ public class MainActivity extends ActivityGroup {
         tabSpec.setIndicator("TEMP_BTN");
         myTabs.addTab(tabSpec);
         */
-
-        /*
-        //bluetooth stuff
-        try
-        {
-            Log.d(TAG, "try");
-            findBT();
-            openBT();
-        }
-        catch (IOException ex) { Log.d(TAG, "couldn't find/open"); }
-        */
-        //startRandomHeatmapThread();
-        //random heatmap points thread
-        //startRandomHeatmapThread();
-
 
         //when this class is created it will automatically open the main menu (puts this is the bg)
         startActivity(new Intent(MainActivity.this, MainMenu.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
@@ -160,6 +163,26 @@ public class MainActivity extends ActivityGroup {
         }
     }
     */
+
+    private AnimationSet createFadeAnimation() {
+        //animation
+        Animation fadeIn = new AlphaAnimation(0, 1);
+        fadeIn.setInterpolator(new DecelerateInterpolator()); // add this
+        fadeIn.setStartOffset(500);
+        fadeIn.setDuration(1000);
+
+        Animation fadeOut = new AlphaAnimation(1, 0);
+        fadeOut.setInterpolator(new AccelerateInterpolator()); // and this
+        fadeOut.setStartOffset(2000);
+        fadeOut.setDuration(1000);
+
+        AnimationSet animation = new AnimationSet(false); // change to false
+        animation.addAnimation(fadeIn);
+        animation.addAnimation(fadeOut);
+        animation.setRepeatCount(0);
+
+        return animation;
+    }
 
     @Override
     protected void onStart() {

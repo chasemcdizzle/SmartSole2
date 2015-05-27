@@ -1,7 +1,85 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/heatmap_layout">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
 
-</LinearLayout>
+    android:id="@+id/container"
+    android:background="#ff000000">
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/heatmap_layout"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/icons_layout">
+        <!-- android:layout_weight="1" -->
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/icons_layout"
+        android:background="#ffffffff">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:id="@+id/navigation_icon_frame">
+
+            <ImageView
+                android:layout_width="@dimen/bottom_buttons_size_small"
+                android:layout_height="@dimen/bottom_buttons_size_small"
+                android:id="@+id/navigation_icon"
+                android:layout_gravity="center"
+                android:src="@drawable/nav_forward" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:id="@+id/record_button_frame">
+
+            <ToggleButton
+                android:id="@+id/record_button"
+                android:layout_width="@dimen/bottom_buttons_size"
+                android:layout_height="@dimen/bottom_buttons_size"
+                android:background="@drawable/record_button_toggle"
+                android:layout_margin="10dp"
+                android:textOn=""
+                android:textOff=""
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:id="@+id/bluetooth_icon_frame">
+
+            <ImageView
+                android:layout_width="@dimen/bottom_buttons_size_small"
+                android:layout_height="@dimen/bottom_buttons_size_small"
+                android:id="@+id/bluetooth_icon"
+                android:layout_gravity="center"
+                android:src="@drawable/bluetooth" />
+
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

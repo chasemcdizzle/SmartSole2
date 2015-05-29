@@ -6,6 +6,8 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.opengl.GLSurfaceView;
+import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -132,7 +134,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                     Log.d("playbackview", "plotting frame");
                     mRenderer.addPoints(myHeatpoints);
                     requestRender();
-                    try{Thread.sleep(50);}
+                    try{Thread.sleep(75);}
                     catch(Exception e){
 
                     }
@@ -141,6 +143,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 }
                 //set playback boolean false
                 Log.d("playbackview", "finished plotting");
+                playbackData = false;
             }
         });
         t.start();
@@ -320,7 +323,8 @@ public class MyGLSurfaceView extends GLSurfaceView {
         readBufferPosition = 0;
         readBuffer = new byte[1024];
 
-        saveBuffer = new int[1024];
+        final int saveBufSize = 128;
+        saveBuffer = new int[saveBufSize];
         saveIndex = 0;
 
         Thread t = new Thread(new Runnable() {
@@ -337,6 +341,11 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 long mBlueToothWatchDogCounter = 0;
 
                 //generate heatmap!
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("bluetooth", true);
+                Message msg = MainActivity.mainHandler.obtainMessage();
+                msg.setData(bundle);
+                MainActivity.mainHandler.sendMessage(msg);
                 while( !connectionTimeout ) {
                     try
                     {
@@ -400,7 +409,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                                     //Log.d(TAG, "PointIndex " + pointIndex + ": " + pointAverages[pointIndex]);
                                     myPoints[pointIndex].intensity = (float)(pointAverages[pointIndex]/1023.0);
                                     if(trueSave){
-                                        if(saveIndex == 1024) {
+                                        if(saveIndex == saveBufSize) {
                                             saveIndex = 0;
                                             Intent msgIntent = new Intent(mainContext, SaveService.class);
                                             msgIntent.putExtra(SaveService.EXTRA_PARAM1, saveBuffer);
@@ -421,6 +430,15 @@ public class MyGLSurfaceView extends GLSurfaceView {
                                             */
                                             if(!saveData && trueSave){
                                                 trueSave = false;
+                                                /*
+                                                Intent intent = new Intent(mainContext, SaveService.class);
+                                                intent.putExtra(SaveService.EXTRA_PARAM2, saveFileName);
+                                                //probably dont need to make a new array for next buf b/c putExtra already copies the array
+                                                //so we don't have to worry about it being modified before we're done saving it
+                                                //saveBuffer = new int[1024];
+                                                intent.setAction("com.db.chase.dbtest.action.rename");
+                                                mainContext.startService(intent);
+                                                */
                                                 Log.d(MainActivity.class.getSimpleName(), "stopped saving");
                                             }
                                         }
@@ -448,7 +466,12 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 //disconnect from bluetooth
                 Log.d(MainActivity.class.getSimpleName(), "Bluetooth Disconnected");
                 heatmapOn = false;
-
+                //turn icon black
+                bundle = new Bundle();
+                bundle.putBoolean("bluetooth", true);
+                msg = MainActivity.mainHandler.obtainMessage();
+                msg.setData(bundle);
+                MainActivity.mainHandler.sendMessage(msg);
             }
         });
         t.start(); //start running the heatmap!

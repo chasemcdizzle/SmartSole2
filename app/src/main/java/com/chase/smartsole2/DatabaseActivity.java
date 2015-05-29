@@ -85,7 +85,7 @@ public class DatabaseActivity extends ActionBarActivity {
                 else if(j == 1)
                     tv.setText("" + points[i]);
                 else if(j == 2)
-                    tv.setText("timestamp goes here");
+                    tv.setText("");
                 row.addView(tv);
             }
 

@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -30,6 +32,8 @@ import android.widget.ToggleButton;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
@@ -58,6 +62,8 @@ public class MainActivity extends ActivityGroup {
     //save variables
     public static boolean saveData = false;
     public static String saveFileName;
+    public static String tempFileName;
+    private SecureRandom random = new SecureRandom();
 
     //playback variable
     public static ArrayList<HeatPoint> pointList;
@@ -67,8 +73,11 @@ public class MainActivity extends ActivityGroup {
     //Random myRandom = new Random();
 
     ImageView navigationImage;
-    ImageView bluetoothImage;
+    public static ImageView bluetoothImage;
+    public static Drawable bluetoothIcon;
     ToggleButton recordButton;
+
+    public static boolean bluetoothOn = false;
 
     public static Handler mainHandler = new Handler(){
         @Override
@@ -76,6 +85,7 @@ public class MainActivity extends ActivityGroup {
             super.handleMessage(msg);
             int[] pointArray = msg.getData().getIntArray("playback");
             saveData = msg.getData().getBoolean("save");
+            boolean bluetooth = msg.getData().getBoolean("bluetooth");
             Log.d(MainActivity.class.getSimpleName(), "savedata: " + saveData + " pointArray: " + pointArray);
             //float intensity = msg.getData().getFloat("intensity");
 
@@ -86,7 +96,20 @@ public class MainActivity extends ActivityGroup {
                 saveFileName = msg.getData().getString("filename");
                 mGLView.setSave(saveData, saveFileName);
             }
-
+            else if(bluetooth){
+                if(!bluetoothOn) {
+                    bluetoothIcon.setColorFilter(Color.BLUE, PorterDuff.Mode.SRC_ATOP);
+                    bluetoothImage.setImageDrawable(bluetoothIcon);
+                    Log.d(MainActivity.class.getSimpleName(), "bluetooth on");
+                    bluetoothOn = true;
+                }
+                else{
+                    bluetoothIcon.setColorFilter(null);
+                    bluetoothImage.setImageDrawable(bluetoothIcon);
+                    Log.d(MainActivity.class.getSimpleName(), "bluetooth off");
+                    bluetoothOn = false;
+                }
+            }
             //otherwise it is a playback message
             else {
                 pointList = new ArrayList<HeatPoint>();
@@ -132,6 +155,7 @@ public class MainActivity extends ActivityGroup {
         recordButton = (ToggleButton) findViewById(R.id.record_button);
         navigationImage = (ImageView) findViewById(R.id.navigation_icon);
         bluetoothImage = (ImageView) findViewById(R.id.bluetooth_icon);
+        bluetoothIcon = getResources().getDrawable(R.drawable.bluetooth);
 
         //record button ontouch listener for navigation back home
         //set button click attributes
@@ -139,11 +163,13 @@ public class MainActivity extends ActivityGroup {
             @Override
             public void onClick(View v) {
                 if(((ToggleButton) v).isChecked()){
-                    mGLView.setSave(true, "sessiontest9");
+                    random = new SecureRandom();
+                    tempFileName = new BigInteger(130, random).toString(32);
+                    mGLView.setSave(true, tempFileName);
                     Log.d("mainactivity", "ischecked, starting save");
                 }
                 if(!((ToggleButton) v).isChecked()){
-                    mGLView.setSave(false, "sessiontest9");
+                    mGLView.setSave(false, tempFileName);
                     Log.d("mainactivity", "not checked, stopping save");
                 }
                 //flag is to not destroy itself

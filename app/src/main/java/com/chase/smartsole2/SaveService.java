@@ -17,6 +17,7 @@ public class SaveService extends IntentService {
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
     private static final String ACTION_SAVE = "com.db.chase.dbtest.action.save";
     private static final String ACTION_READ = "com.db.chase.dbtest.action.read";
+    private static final String ACTION_RENAME = "com.db.chase.dbtest.action.rename";
 
     // TODO: Rename parameters
     public static final String EXTRA_PARAM1 = "com.db.chase.dbtest.extra.data";
@@ -66,6 +67,10 @@ public class SaveService extends IntentService {
                 final String fileName = intent.getStringExtra(EXTRA_PARAM2);
                 handleActionRead(fileName);
             }
+            if(ACTION_RENAME.equals(action)){
+                final String oldName = intent.getStringExtra(EXTRA_PARAM2);
+                handleActionRename(oldName);
+            }
         }
     }
 
@@ -86,6 +91,10 @@ public class SaveService extends IntentService {
         String result = textFileHandler.readFile(fileName);
         //Log.d(MainActivity.class.getSimpleName(), result);
         Log.d(MainActivity.class.getSimpleName(),  "length: " + result.length());
+    }
+
+    private void handleActionRename(String oldName){
+        textFileHandler.renameFile(oldName);
     }
 
 }

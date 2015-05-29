@@ -3,12 +3,9 @@ package com.chase.smartsole2;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Message;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -51,10 +48,10 @@ public class Tab2Activity extends FragmentActivity {
                 "Name: " + prefs.getString("name", ""),
                 "Total Steps: ",
                 "Steps Today: ",
-                "Daily Step Goal: " + prefs.getInt("goal", 0),
-                "Record",
-                "Sessions",
-                "Playback"
+                "Daily Step Goal: " + prefs.getInt("goal", 0)
+                //"Record",
+                //"Sessions",
+                //"Playback"
         };
         //Put them into a list so they will be mutable later
         List<String> items = new ArrayList<String>(Arrays.asList(itemStrings));
@@ -82,6 +79,7 @@ public class Tab2Activity extends FragmentActivity {
                     setStepGoal(itemPosition);
                 }
                 //saves data
+                /*
                 else if(itemPosition == 4){
                     //saveData = msg.getData().getBoolean("save");
                     Log.d(MainActivity.class.getSimpleName(), "record clicked");
@@ -114,6 +112,7 @@ public class Tab2Activity extends FragmentActivity {
                     startActivity(new Intent(Tab2Activity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                     MainActivity.mainHandler.sendMessage(message);
                 }
+                */
                 else {
                     // ListView Clicked item value
                     String itemValue = (String) listView.getItemAtPosition(position);

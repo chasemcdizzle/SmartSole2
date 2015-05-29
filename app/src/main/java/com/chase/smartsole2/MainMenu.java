@@ -17,6 +17,7 @@ public class MainMenu extends Activity {
     private Button profileButton;
     private Button heatmapButton;
     private Button sessionsButton;
+    private String tempFileName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +61,7 @@ public class MainMenu extends Activity {
             public void onClick(View v) {
 
                 //this should eventually go to the playback list
-                startActivity( new Intent(MainMenu.this, SessionsActivity.class).addFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT )  );
+                startActivity( new Intent(MainMenu.this, SessionsActivity.class)  );
             }
         });
     }

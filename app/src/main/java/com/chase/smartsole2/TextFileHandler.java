@@ -1,8 +1,11 @@
 package com.chase.smartsole2;
 
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
+import android.widget.EditText;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -133,4 +136,46 @@ public class TextFileHandler {
         String contents = new String(bytes);
         return contents;
     }
+
+    public void renameFile(String origName){
+        setFileNameDialogue(origName);
+    }
+    public void setFileNameDialogue(String origName){
+        final EditText input = new EditText(context);
+        final String oldName = origName;
+        new AlertDialog.Builder(context)
+                .setTitle("Enter name")
+                .setMessage("Enter a name for your recording")
+                .setView(input)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String in = input.getText().toString();
+                        //if they entered a valid integer
+                        if(!in.contains(".txt")) {
+                            file = context.getFileStreamPath(oldName + ".txt");
+                            File newFile = context.getFileStreamPath(in + ".txt");
+                            file.renameTo(newFile);
+                        }
+                        else{
+                            alert("Filename must not contain the term .txt");
+                            setFileNameDialogue(oldName);
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // Do nothing.
+                    }
+                }).show();
+    }
+
+    public void alert(String msg){
+        new AlertDialog.Builder(context)
+                .setTitle(msg)
+                .setMessage("You must enter an integer value.")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
 }

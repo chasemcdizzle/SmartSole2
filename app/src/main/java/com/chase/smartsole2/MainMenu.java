@@ -23,7 +23,7 @@ public class MainMenu extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //start the heatmap activity (it will go in the bg because the on create puts this back... very jank)
-        startActivity( new Intent(MainMenu.this, MainActivity.class) );
+        startActivity( new Intent(MainMenu.this, MainActivity.class).addFlags( Intent.FLAG_ACTIVITY_REORDER_TO_FRONT ) );
         //test
         Log.d("main menu","CREATED");
 

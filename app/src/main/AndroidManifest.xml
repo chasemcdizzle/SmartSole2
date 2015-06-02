@@ -72,11 +72,11 @@
         </activity>
         <activity
             android:name=".SessionsActivity"
-            android:label="@string/title_activity_sessions" >
+            android:label="Saved Sessions" >
         </activity>
         <activity
             android:name=".DatabaseActivity"
-            android:label="@string/title_activity_database" >
+            android:label="Saved Data" >
         </activity>
     </application>
 

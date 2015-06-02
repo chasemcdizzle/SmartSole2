@@ -9,6 +9,8 @@ import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -32,6 +34,11 @@ public class Tab2Activity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_tab2);
         //setup saved prefs
         prefs = this.getSharedPreferences(
@@ -126,6 +133,8 @@ public class Tab2Activity extends FragmentActivity {
             }
         });
     }
+
+    //overridePendingTransition(R.anim.anim_slide_in_right, R.anim.anim_slide_out_right);
 
     public void alert(String msg){
         new AlertDialog.Builder(this)

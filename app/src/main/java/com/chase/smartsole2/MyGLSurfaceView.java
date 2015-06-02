@@ -59,10 +59,15 @@ public class MyGLSurfaceView extends GLSurfaceView {
     String saveFileName;
     int bufsSaved = 0;
 
+    int x = 0;
+
     //playback variable
     ArrayList<HeatPoint> playbackPoints;
     boolean playbackData = false;
+    boolean pausePlayback = false;
 
+    //clear the screen with empty points
+    HeatPoint[] clearScreenPoints = new HeatPoint[8];
 
 	public MyGLSurfaceView(Context context) {
 		super(context);
@@ -85,44 +90,63 @@ public class MyGLSurfaceView extends GLSurfaceView {
         pointAverages = new double[8];
         sampleSize = 1;
 
+        for(int i = 0; i < 8; i++){
+            clearScreenPoints[i] = new HeatPoint(0,0,0,0);
+        }
+
         //startRandomThread(height, width);
 
 	}
 
+    //function to clear the screen
+    public void clearScreen(){
+        mRenderer.addPoints(clearScreenPoints);
+        requestRender();
+    }
+
+    //function that starts recording
     public void setSave(boolean save, String filename){
         saveData = save;
         saveFileName = filename;
         Log.d(MainActivity.class.getSimpleName(), "saveset() finished, saveset val: " + saveData);
     }
-
+    //function that sets the current index for the playback buffer
+    //used by seekbar to control current session being played
+    public void setPlaybackIndex(int set){
+        x = set*8;
+    }
 
     public void startPlaybackThread(ArrayList<HeatPoint> pts) {
         //turn off bluetooth thread because we are going to playback data now
         //set playback boolean to true so can't start bluetooth until its done
-        playbackData = true;
-        Log.d("playbackview", "playbackthread started");
-        playbackPoints = pts;
-        //grab the points array from whatever we get via getextra or whatever
-        Thread t = new Thread(new Runnable() {
-            public void run() {
-                Log.d("playbackview", "run() started. size: " + playbackPoints.size());
-                HeatPoint[] myHeatpoints = new HeatPoint[8];
-                int x = 0;
-                while (x < playbackPoints.size() && playbackData == true) {
-                    Log.d("playbackview", "while() running");
-                    int i = 0;
-                    for(; i < 8; i++) {
-                        try{
-                            myHeatpoints[i] = playbackPoints.get(x+i);
-                            //Log.d("playbackview", "stored point");
-                        }
-                        catch(Exception e){
 
-                        }
-                    }
-                    //if the last frame has less than 8 points, populate the rest of the 8 points with 0 intensity
-                    //even if catch happens, for loop will still increment, so i represents the first point
-                    //that wasn't plotted
+        //don't want to play a session if one is currently playing
+        if(!playbackData) {
+            playbackData = true;
+            Log.d("playbackview", "playbackthread started");
+            playbackPoints = pts;
+            //grab the points array from whatever we get via getextra or whatever
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    Log.d("playbackview", "run() started. size: " + playbackPoints.size());
+                    HeatPoint[] myHeatpoints = new HeatPoint[8];
+                    x = 0;
+                    while(playbackData == true) {
+                        while (x < playbackPoints.size() && playbackData) {
+                            //Log.d("playbackview", "while() running");
+                            if(!pausePlayback) {
+                                int i = 0;
+                                for (; i < 8; i++) {
+                                    try {
+                                        myHeatpoints[i] = playbackPoints.get(x + i);
+                                        //Log.d("playbackview", "stored point");
+                                    } catch (Exception e) {
+
+                                    }
+                                }
+                                //if the last frame has less than 8 points, populate the rest of the 8 points with 0 intensity
+                                //even if catch happens, for loop will still increment, so i represents the first point
+                                //that wasn't plotted
                     /*
                     if(i < x+8){
                         for(int y = x+i; y < x+8; y++){
@@ -131,23 +155,36 @@ public class MyGLSurfaceView extends GLSurfaceView {
                         }
                     }
                     */
-                    Log.d("playbackview", "plotting frame");
-                    mRenderer.addPoints(myHeatpoints);
-                    requestRender();
-                    try{Thread.sleep(75);}
-                    catch(Exception e){
+                                //Log.d("playbackview", "plotting frame");
+                                mRenderer.addPoints(myHeatpoints);
+                                requestRender();
+                                //update seekbar
+                                Bundle bundle = new Bundle();
+                                bundle.putInt("seekProgress", x / 8);
+                                Message msg = MainActivity.mainHandler.obtainMessage();
+                                msg.setData(bundle);
+                                MainActivity.mainHandler.sendMessage(msg);
 
+                                //sleep so that the framerate isn't too fast
+                                try {
+                                    Thread.sleep(75);
+                                } catch (Exception e) {
+
+                                }
+
+                                x += 8;
+                            }
+                        }
                     }
-
-                    x += 8;
+                    //set playback boolean false
+                    Log.d("playbackview", "finished plotting");
+                    //pressing back now disables playback data
+                    //so user can seek around if they want
+                    //playbackData = false;
                 }
-                //set playback boolean false
-                Log.d("playbackview", "finished plotting");
-                playbackData = false;
-            }
-        });
-        t.start();
-
+            });
+            t.start();
+        }
 
     }
 
@@ -220,12 +257,10 @@ public class MyGLSurfaceView extends GLSurfaceView {
 	public boolean onTouchEvent(MotionEvent e) {
         //startRandomThread(height, width);
         //startRandomThread(height, width);
-
         switch (e.getAction()) {
 		case MotionEvent.ACTION_DOWN:
             if(!heatmapOn) {
                 //startRandomThread(height, width);
-
                 try
                 {
                     Log.d(TAG, "try");
@@ -234,7 +269,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
                     //only go true if we successfully find and open bluetooth
                     heatmapOn = true;
-
+                    connectionTimeout = false;
                 }
                 catch (IOException ex) {
                     Log.d(TAG, "couldn't find/open"); //did not find bluetooth
@@ -340,7 +375,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 //watchdog timer/counter
                 long mBlueToothWatchDogCounter = 0;
 
-                //generate heatmap!
+                //generate heatmap!, turn blue the bluetooth icon
                 Bundle bundle = new Bundle();
                 bundle.putBoolean("bluetooth", true);
                 Message msg = MainActivity.mainHandler.obtainMessage();
@@ -352,6 +387,8 @@ public class MyGLSurfaceView extends GLSurfaceView {
                         int bytesAvailable = mmInputStream.available();
                         if(bytesAvailable > 0)
                         {
+                            //reset counter, cause we haven't been disconected
+                            mBlueToothWatchDogCounter = 0;
                             byte[] packetBytes = new byte[bytesAvailable];
                             mmInputStream.read(packetBytes);
                             for(int i=0;i<bytesAvailable;i++)
@@ -453,6 +490,13 @@ public class MyGLSurfaceView extends GLSurfaceView {
                                 {
                                     readBuffer[readBufferPosition++] = b;
                                 }
+                            }
+                        }
+                        else{
+                            mBlueToothWatchDogCounter++;
+                            if(mBlueToothWatchDogCounter == mBlueToothWatchDogCount){
+                                connectionTimeout = true;
+                                mBlueToothWatchDogCounter = 0;
                             }
                         }
                     }

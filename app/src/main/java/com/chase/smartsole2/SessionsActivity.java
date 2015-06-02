@@ -163,6 +163,11 @@ public class SessionsActivity extends ActionBarActivity {
 
 
     @Override
+    public void onBackPressed() {
+        startActivity(new Intent(SessionsActivity.this, MainMenu.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_sessions, menu);

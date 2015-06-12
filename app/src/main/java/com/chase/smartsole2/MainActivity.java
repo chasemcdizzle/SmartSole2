@@ -135,7 +135,7 @@ public class MainActivity extends ActivityGroup {
                     bluetoothIcon.setColorFilter(null);
                     bluetoothImage.setImageDrawable(bluetoothIcon);
                     Log.d(MainActivity.class.getSimpleName(), "bluetooth off");
-                    bluetoothOn = false;
+                    //bluetoothOn = false;
                 }
                 bluetoothFrame.setOnClickListener(playPauseListener);
                 bluetoothImage.setImageDrawable(pauseIcon);
@@ -362,6 +362,7 @@ public class MainActivity extends ActivityGroup {
             if(bluetoothOn) {
                 bluetoothIcon.setColorFilter(Color.BLUE, PorterDuff.Mode.SRC_ATOP);
                 bluetoothImage.setImageDrawable(bluetoothIcon);
+                bluetoothIcon.setColorFilter(Color.BLUE, PorterDuff.Mode.SRC_ATOP);
                 Log.d(MainActivity.class.getSimpleName(), "bluetooth on");
                 bluetoothOn = true;
             }

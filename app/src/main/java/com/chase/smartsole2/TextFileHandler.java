@@ -37,6 +37,36 @@ public class TextFileHandler {
         }
     }
 
+    public void writeTimes(long[] times, String fileName){
+        try {
+            file = context.getFileStreamPath(fileName);
+            try {
+                if (!file.exists())
+                    file.createNewFile();
+            }
+            catch(Exception e){
+                Log.d(MainActivity.class.getSimpleName(), e.toString());
+            }
+            output = new FileOutputStream(file, true);
+        }
+        catch(Exception e){
+            Log.d(MainActivity.class.getSimpleName(), "Could not openfileOutput");
+        }
+        String datastring = "";
+        try {
+            for (int i = 0; i < times.length; i++) {
+                //output.write(String.valueOf(data[i]));
+                datastring += String.valueOf(times[i]);
+                datastring += "\n";
+            }
+            output.write(datastring.getBytes());
+        }
+        catch(Exception e){
+            Log.d(MainActivity.class.getSimpleName(), e.toString());
+            Log.d(MainActivity.class.getSimpleName(), "couldn't write data");
+        }
+    }
+
     public void writeInts(int[] data, String fileName){
         try {
             file = context.getFileStreamPath(fileName + ".txt");
@@ -83,6 +113,23 @@ public class TextFileHandler {
         return pointList;
     }
 
+    public long[] getLongArrayFromFile(String fileName){
+        //loop through all of the rows of the table
+        int sensorNum = 0;
+        String fileData = readTime(fileName);
+        String[] sensors = fileData.split("\n");
+        //make numpoints the same size as the sensors string array
+        long[] points = new long[sensors.length];
+        for(int i = 0; i < sensors.length; i++){
+            //Log.d("textfile handler", sensors[i]);
+            if(!sensors[i].equals("")) {
+                long intensity = Long.parseLong(sensors[i]);
+                points[i] = intensity;
+            }
+        }
+        return points;
+    }
+
     public int[] getIntArrayFromFile(String fileName){
         //loop through all of the rows of the table
         int sensorNum = 0;
@@ -91,13 +138,50 @@ public class TextFileHandler {
         //make numpoints the same size as the sensors string array
         int[] points = new int[sensors.length];
         for(int i = 0; i < sensors.length; i++){
-            Log.d("textfile handler", sensors[i]);
+            //Log.d("textfile handler", sensors[i]);
             if(!sensors[i].equals("")) {
                 int intensity = Integer.parseInt(sensors[i]);
                 points[i] = intensity;
             }
         }
         return points;
+    }
+
+    public String readTime(String fileName){
+        Log.d(MainActivity.class.getSimpleName(), "in readFile() ");
+        file = context.getFileStreamPath(fileName);
+        try {
+            if (!file.exists())
+                file.createNewFile();
+        }
+        catch(Exception e){
+            Log.d(MainActivity.class.getSimpleName(), e.toString());
+        }
+        try {
+            input = new FileInputStream(file);
+        }
+        catch(Exception e){
+            Log.d(MainActivity.class.getSimpleName(), "Could not openfileOutput");
+        }
+        //Log.d(MainActivity.class.getSimpleName(), "right before length = ");
+        int length = (int) file.length();
+        //Log.d(MainActivity.class.getSimpleName(), "Printing length: ");
+        //Log.d(MainActivity.class.getSimpleName(), String.valueOf(length));
+        byte[] bytes = new byte[length];
+        try {
+            try {
+                input.read(bytes);
+            } finally {
+                input.close();
+            }
+        }
+        catch(Exception e){
+            Log.d(MainActivity.class.getSimpleName(), "couldn't read data");
+        }
+
+
+        String contents = new String(bytes);
+        return contents;
     }
 
     public String readFile(String fileName){

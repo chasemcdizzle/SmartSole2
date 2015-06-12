@@ -68,7 +68,9 @@ public class SessionsActivity extends ActionBarActivity {
             TextView tv = (TextView) newView.findViewById(R.id.itemText);
             Button b = (Button) newView.findViewById(R.id.itemButton);
             Log.d("adapter:",message);
-            tv.setText(message);
+            int index = items.indexOf(message);
+            tv.setText("Session " + (index+1));
+            final String sessionName = "Session " + (index+1);
             b.setText("Playback");
 
             // Sets a listener for the button, and a tag for the button as well.
@@ -96,6 +98,7 @@ public class SessionsActivity extends ActionBarActivity {
                     Context context = v.getContext();
                     Intent intent = new Intent(SessionsActivity.this, DatabaseActivity.class);
                     intent.putExtra("tableName", message);
+                    intent.putExtra("sessionName", sessionName);
                     context.startActivity(intent);
                 }
             });
@@ -121,12 +124,13 @@ public class SessionsActivity extends ActionBarActivity {
             if(extensionIndex != -1){
                 //delete files if you want
                 /*
-                if(file[i].getName().equals("sessiontest9.txt"))
+                if(file[i].getName().equals("aserheuh3"))
                     Log.d("sessions", "found sessiontest9.txt");
                 else{
                     file[i].delete();
                 }
                 */
+
                 //Log.d(MainActivity.class.getSimpleName(), ".txt @: " + file[i].getName().indexOf(".txt") + " length: " + file[i].getName().length());
                 items.add(file[i].getName().substring(0, extensionIndex));
             }

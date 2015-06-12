@@ -11,26 +11,40 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 public class DatabaseActivity extends ActionBarActivity {
     TableLayout table_layout;
     String tableName;
+    String sessionName;
     TextView title;
     TextFileHandler textFileHandler;
     Button backButton;
+    SimpleDateFormat dt;
+    NumberFormat numFormat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_database);
 
+        //initialize date format
+        dt = new SimpleDateFormat("hh:mm:ss.S");
+        //number format for pressure
+        numFormat = new DecimalFormat("#0.00");
+
         //grab tablename from bundle
         Bundle crossActivityBundle = getIntent().getExtras();
         tableName = crossActivityBundle.getString("tableName");
+        sessionName = crossActivityBundle.getString("sessionName");
 
         table_layout = (TableLayout) findViewById(R.id.tableLayout);
         title = (TextView) findViewById(R.id.textView);
-        title.setText(tableName);
+        title.setText(sessionName);
 
         //setup textfilehandler
         textFileHandler = new TextFileHandler(tableName, this);
@@ -62,6 +76,8 @@ public class DatabaseActivity extends ActionBarActivity {
 
 
         int[] points = textFileHandler.getIntArrayFromFile(tableName);
+        long[] times = textFileHandler.getLongArrayFromFile(tableName);
+
         Log.d("databaseactivity", "points.length = " + points.length);
         //create a row for each heatpoint
         for (int i = 0; i < points.length; i++) {
@@ -83,9 +99,11 @@ public class DatabaseActivity extends ActionBarActivity {
                 if(j == 0)
                     tv.setText("" + i % 8);
                 else if(j == 1)
-                    tv.setText("" + points[i]);
-                else if(j == 2)
-                    tv.setText("");
+                    tv.setText(numFormat.format(points[i]*.1178) + " lb");
+                else if(j == 2) {
+                    Date resultDate = new Date(times[i]);
+                    tv.setText("" + dt.format(resultDate));
+                }
                 row.addView(tv);
             }
 

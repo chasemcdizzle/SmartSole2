@@ -53,6 +53,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
     //saving sensor data field variables
     int[] saveBuffer;
+    long[] saveTimeBuffer;
     int saveIndex;
     boolean saveData = false;
     boolean trueSave = false;
@@ -167,7 +168,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
                                 //sleep so that the framerate isn't too fast
                                 try {
-                                    Thread.sleep(75);
+                                    Thread.sleep(90);
                                 } catch (Exception e) {
 
                                 }
@@ -360,6 +361,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
         final int saveBufSize = 128;
         saveBuffer = new int[saveBufSize];
+        saveTimeBuffer = new long[saveBufSize];
         saveIndex = 0;
 
         Thread t = new Thread(new Runnable() {
@@ -375,12 +377,17 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 //watchdog timer/counter
                 long mBlueToothWatchDogCounter = 0;
 
-                //generate heatmap!, turn blue the bluetooth icon
-                Bundle bundle = new Bundle();
-                bundle.putBoolean("bluetooth", true);
-                Message msg = MainActivity.mainHandler.obtainMessage();
-                msg.setData(bundle);
-                MainActivity.mainHandler.sendMessage(msg);
+                //generate heatmap!, turn blue the bluetooth icon if its not already
+                Bundle bundle;
+                Message msg;
+                if(!MainActivity.bluetoothOn) {
+                    bundle = new Bundle();
+                    bundle.putBoolean("bluetooth", true);
+                    msg = MainActivity.mainHandler.obtainMessage();
+                    msg.setData(bundle);
+                    MainActivity.mainHandler.sendMessage(msg);
+                    Log.d("bluetooth debug", "beginning of bluethread");
+                }
                 while( !connectionTimeout ) {
                     try
                     {
@@ -457,6 +464,14 @@ public class MyGLSurfaceView extends GLSurfaceView {
                                             msgIntent.setAction("com.db.chase.dbtest.action.save");
                                             mainContext.startService(msgIntent);
                                             Log.d(MainActivity.class.getSimpleName(), "saveservice started");
+
+                                            //save times now
+                                            msgIntent = new Intent(mainContext, SaveService.class);
+                                            msgIntent.putExtra(SaveService.EXTRA_PARAM1, saveTimeBuffer);
+                                            msgIntent.putExtra(SaveService.EXTRA_PARAM2, saveFileName);
+                                            msgIntent.setAction("com.db.chase.dbtest.action.time");
+                                            mainContext.startService(msgIntent);
+
                                             bufsSaved++;
                                             /*
                                             if(bufsSaved == 2){
@@ -480,6 +495,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                                             }
                                         }
                                         saveBuffer[saveIndex] = (int)pointAverages[pointIndex];
+                                        saveTimeBuffer[saveIndex] = System.currentTimeMillis();
                                         saveIndex++;
                                     }
                                     //myPoints[pointIndex].intensity = (float)(intensity/1023.0);
@@ -497,6 +513,15 @@ public class MyGLSurfaceView extends GLSurfaceView {
                             if(mBlueToothWatchDogCounter == mBlueToothWatchDogCount){
                                 connectionTimeout = true;
                                 mBlueToothWatchDogCounter = 0;
+                                //turn icon black
+                                if(MainActivity.bluetoothOn) {
+                                    bundle = new Bundle();
+                                    bundle.putBoolean("bluetooth", true);
+                                    msg = MainActivity.mainHandler.obtainMessage();
+                                    msg.setData(bundle);
+                                    MainActivity.mainHandler.sendMessage(msg);
+                                    Log.d("bluetooth debug", "end of bluethread");
+                                }
                             }
                         }
                     }
@@ -510,12 +535,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 //disconnect from bluetooth
                 Log.d(MainActivity.class.getSimpleName(), "Bluetooth Disconnected");
                 heatmapOn = false;
-                //turn icon black
-                bundle = new Bundle();
-                bundle.putBoolean("bluetooth", true);
-                msg = MainActivity.mainHandler.obtainMessage();
-                msg.setData(bundle);
-                MainActivity.mainHandler.sendMessage(msg);
             }
         });
         t.start(); //start running the heatmap!
